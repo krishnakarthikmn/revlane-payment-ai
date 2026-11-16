@@ -1,0 +1,28 @@
+# Copy to terraform.tfvars and put in your own image addresses. No secrets go here.
+environment = "staging"
+
+services = {
+  api = {
+    image   = "<account>.dkr.ecr.ap-south-1.amazonaws.com/revlane-api:<tag>"
+    command = ["uvicorn", "revlane.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    port    = 8000
+    cpu     = 512
+    memory  = 1024
+    count   = 2
+  }
+  worker = {
+    image   = "<account>.dkr.ecr.ap-south-1.amazonaws.com/revlane-api:<tag>"
+    command = ["python", "-m", "revlane.harness", "worker"]
+    cpu     = 1024
+    memory  = 4096
+    count   = 1
+  }
+  web = {
+    image   = "<account>.dkr.ecr.ap-south-1.amazonaws.com/revlane-web:<tag>"
+    command = ["npm", "run", "start"]
+    port    = 3000
+    cpu     = 256
+    memory  = 512
+    count   = 2
+  }
+}

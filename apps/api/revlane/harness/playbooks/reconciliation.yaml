@@ -1,0 +1,18 @@
+# Money that was paid but never reached the bank: proposes settlement queries
+# to the provider and a list of bookings to offer again.
+playbook: reconciliation
+version: 1
+trigger:
+  - schedule: "30 6 * * *"
+read_tools: [findings_for, evidence_for, settlement_lines, bank_credits, rupee_impact]
+actions:
+  - type: draft_settlement_query
+    approval: required
+    applies_to: [settled_short, captured_not_settled]
+    limits: {min_claim_minor: 100000, max_claims_per_run: 20}
+  - type: draft_reoffer_list
+    approval: required
+    applies_to: [paid_auto_refunded]
+    limits: {max_claims_per_run: 20}
+output_schema: FindingAndProposal_v1
+escalate_if: [confidence < 0.8]

@@ -1,0 +1,21 @@
+# Local development. `make dev` starts the database from here when Docker is
+# installed; the API and the web app run on the host so they reload on save.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: revlane
+      POSTGRES_PASSWORD: revlane
+      POSTGRES_DB: revlane
+    ports:
+      - "5432:5432"
+    volumes:
+      - revlane-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U revlane -d revlane"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  revlane-db:

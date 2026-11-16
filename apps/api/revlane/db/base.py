@@ -1,0 +1,7 @@
+"""Declarative base for every model."""
+
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    pass

@@ -1,0 +1,34 @@
+# Secrets and generated data: never committed
+.env
+.env.*
+!.env.example
+data/
+.make.local
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+.next-e2e/
+test-results/
+playwright-report/
+apps/web/e2e/.auth/
+*.tsbuildinfo
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+
+# Infrastructure
+.terraform/
+*.tfstate*
+terraform.tfvars

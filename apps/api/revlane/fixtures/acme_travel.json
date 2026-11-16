@@ -1,0 +1,491 @@
+{
+  "version": 1,
+  "merchant": {
+    "name": "Acme Travel",
+    "user": { "name": "Priya Menon", "first_name": "Priya", "initial": "P", "team": "Finance" },
+    "second_approver": { "name": "Arjun", "team": "Payments" }
+  },
+  "summary": {
+    "pill": "Weekly summary",
+    "text": "₹22.6L slipped away · 4 fixes waiting",
+    "question": "Where did we lose the most last week?"
+  },
+  "agents": [
+    {
+      "key": "failure",
+      "name": "Failed-payment recovery",
+      "short": "Failures",
+      "leak": "Failed payments",
+      "family": "Recover",
+      "lost_minor": 94000000,
+      "color": "#C4643F",
+      "initial_status": "pending",
+      "initial_autonomy": 1,
+      "headline": "UPI payments from HDFC Bank customers on Razorpay timed out on Tuesday, 2–4 pm. Success fell 9.1 points.",
+      "causes": [
+        { "label": "UPI · HDFC Bank · Razorpay · bank timeout", "pct": 71 },
+        { "label": "Card · ICICI · PayU · 3D Secure failed", "pct": 18 },
+        { "label": "Other banks and methods", "pct": 11 }
+      ],
+      "proposal": "Send 600 shoppers who are likely to come back a link with another UPI app or a no-cost EMI, holding 106 back as a control group.",
+      "meta": [
+        { "k": "Targets", "v": "600 shoppers" },
+        { "k": "Control group", "v": "106 (15%)" },
+        { "k": "Expected recovery", "v": "₹2.1L–₹3.9L" },
+        { "k": "Channel", "v": "WhatsApp, then SMS" }
+      ],
+      "tools": "query_attempts → baseline_anomaly → root_cause_split → rupee_impact → recoverability_score",
+      "done": "Approved. 600 links are queued on WhatsApp through each shopper's original gateway; results against control in 48 hours.",
+      "settings": [
+        { "k": "Trigger when success drops by", "v": "1.5 points" },
+        { "k": "High-value threshold", "v": "₹25,000" },
+        { "k": "Fallback methods", "v": "Other UPI app, no-cost EMI" },
+        { "k": "Quiet hours", "v": "10 pm – 8 am" }
+      ]
+    },
+    {
+      "key": "routing",
+      "name": "Routing advisor",
+      "short": "Routing",
+      "leak": "Weaker gateway for some banks",
+      "family": "Recover",
+      "lost_minor": 35000000,
+      "color": "#E39572",
+      "initial_status": "pending",
+      "initial_autonomy": 0,
+      "headline": "ICICI credit cards succeed 6.2 points more often on PayU than on Razorpay this week.",
+      "causes": [
+        { "label": "ICICI credit cards sent to Razorpay", "pct": 58 },
+        { "label": "Axis debit cards sent to Cashfree", "pct": 27 },
+        { "label": "SBI UPI collect requests", "pct": 15 }
+      ],
+      "proposal": "Move ICICI credit-card traffic from Razorpay to PayU, for an estimated 1.8-point lift in card success. Your payments team applies it.",
+      "meta": [
+        { "k": "Scope", "v": "~4,100 attempts / week" },
+        { "k": "Evidence", "v": "28 days, 95% conf." },
+        { "k": "Expected gain", "v": "₹1.9L a week" },
+        { "k": "Applied by", "v": "Payments team" }
+      ],
+      "tools": "success_matrix → baseline_anomaly → rupee_impact",
+      "done": "Approved. Revlane will compare success before and after the change for 14 days.",
+      "settings": [
+        { "k": "Minimum attempts", "v": "200" },
+        { "k": "Confidence required", "v": "95%" },
+        { "k": "Review cadence", "v": "Weekly, Monday 9 am" },
+        { "k": "Notify", "v": "#payments on Slack" }
+      ]
+    },
+    {
+      "key": "recon",
+      "name": "Reconciliation",
+      "short": "Reconciliation",
+      "leak": "Paid, never received",
+      "family": "Money",
+      "lost_minor": 31000000,
+      "color": "#8C3A1C",
+      "initial_status": "pending",
+      "initial_autonomy": 1,
+      "headline": "40 paid bookings were auto-refunded, and 3 marketplace settlements arrived short.",
+      "causes": [
+        { "label": "Paid bookings auto-refunded", "pct": 42 },
+        { "label": "Marketplace settlements short-paid", "pct": 39 },
+        { "label": "Captured, not settled after 3 days", "pct": 19 }
+      ],
+      "proposal": "Offer the 40 auto-refunded bookings back to their customers, and raise 3 settlement queries with the marketplace, evidence attached.",
+      "meta": [
+        { "k": "Re-offer", "v": "40 bookings · ₹1.3L" },
+        { "k": "Queries", "v": "3 · ₹1.2L" },
+        { "k": "In transit", "v": "₹0.6L" },
+        { "k": "Matched today", "v": "98.7% of ₹4.2 Cr" }
+      ],
+      "tools": "three_way_match → settlement_lines → bank_credits → rupee_impact",
+      "done": "Approved. Re-booking offers sent to 40 customers and 3 queries filed; Revlane will check the next payouts.",
+      "settings": [
+        { "k": "Match tolerance", "v": "₹1 per line" },
+        { "k": "Flag unsettled after", "v": "3 days" },
+        { "k": "Post entries to", "v": "Zoho Books" },
+        { "k": "Daily summary to", "v": "#finance" }
+      ]
+    },
+    {
+      "key": "fees",
+      "name": "Fee audit",
+      "short": "Fees",
+      "leak": "Fee overcharges",
+      "family": "Money",
+      "lost_minor": 26000000,
+      "color": "#BC8B66",
+      "initial_status": "pending",
+      "initial_autonomy": 1,
+      "headline": "Cashfree charged 2.15% on Amex cards against a 2.00% contract, and PayU charged GST on refunded fees.",
+      "causes": [
+        { "label": "Amex rate above contract · Cashfree", "pct": 61 },
+        { "label": "GST on refunded fees · PayU", "pct": 24 },
+        { "label": "Instant-payout fee · Razorpay", "pct": 15 }
+      ],
+      "proposal": "Send overcharge claims to Cashfree, PayU and Razorpay with transaction-level evidence, and track the credits on future settlements.",
+      "meta": [
+        { "k": "Claims", "v": "3 providers" },
+        { "k": "Amount", "v": "₹2.6L · October" },
+        { "k": "Evidence", "v": "1,912 lines" },
+        { "k": "Follow-up", "v": "Next 2 settlements" }
+      ],
+      "tools": "fee_check → settlement_lines → contract_rates",
+      "done": "Approved. Claims sent to 3 providers; Revlane will confirm the credits on the next settlements.",
+      "settings": [
+        { "k": "Overcharge threshold", "v": "₹1 or 0.05% per line" },
+        { "k": "Contract file", "v": "Fee contracts 2026.pdf" },
+        { "k": "Claim contact", "v": "finance@acme-travel.example" },
+        { "k": "Run on", "v": "1st of month" }
+      ]
+    },
+    {
+      "key": "subs",
+      "name": "Subscription recovery",
+      "short": "Subscriptions",
+      "leak": "Failed auto-debits",
+      "family": "Recover",
+      "lost_minor": 22000000,
+      "color": "#7A6A5C",
+      "initial_status": "approved",
+      "initial_autonomy": 2,
+      "headline": "212 Acme Plus auto-debits failed this month, 61% for insufficient funds in the first 3 days.",
+      "causes": [
+        { "label": "Insufficient funds at month start", "pct": 61 },
+        { "label": "Expired or replaced card", "pct": 23 },
+        { "label": "Mandate revoked or paused", "pct": 16 }
+      ],
+      "proposal": "Retry 129 debits after the 5th with pre-debit notice, and send card-update links to 48 members and re-register links to 35.",
+      "meta": [
+        { "k": "Retries", "v": "129 after the 5th" },
+        { "k": "Update links", "v": "48" },
+        { "k": "Re-register", "v": "35" },
+        { "k": "At risk", "v": "₹2.2L a month" }
+      ],
+      "tools": "mandate_failures → retry_timing → recoverability_score",
+      "done": "Running. Retries scheduled for the 6th with pre-debit notices; 83 update and re-register links sent.",
+      "settings": [
+        { "k": "Max retries", "v": "2 per cycle" },
+        { "k": "Retry window", "v": "6th–8th, 9 am – 12 pm" },
+        { "k": "Pre-debit notice", "v": "24 hours" },
+        { "k": "Stop after", "v": "30 days" }
+      ]
+    },
+    {
+      "key": "chargeback",
+      "name": "Chargeback",
+      "short": "Disputes",
+      "leak": "Disputes at risk",
+      "family": "Recover",
+      "lost_minor": 18000000,
+      "color": "#D9B8A3",
+      "initial_status": "approved",
+      "initial_autonomy": 1,
+      "headline": "5 disputes are due within 48 hours; 3 look winnable because payments passed 3D Secure and customers travelled.",
+      "causes": [
+        { "label": "Winnable: verified and travelled", "pct": 64 },
+        { "label": "Low odds: no proof of travel", "pct": 24 },
+        { "label": "Repeat disputer", "pct": 12 }
+      ],
+      "proposal": "Submit evidence-backed responses for the 3 winnable disputes, and accept the 2 with low odds to save handling cost.",
+      "meta": [
+        { "k": "Due", "v": "Within 48 hours" },
+        { "k": "Win odds", "v": "78%, 74%, 69%" },
+        { "k": "At stake", "v": "₹1.8L" },
+        { "k": "Evidence", "v": "Booking, 3DS, boarding" }
+      ],
+      "tools": "get_disputes → win_odds → evidence_pack",
+      "done": "Running. 3 responses submitted with evidence; 2 accepted. Bank decisions in 30–45 days.",
+      "settings": [
+        { "k": "Contest above win odds", "v": "60%" },
+        { "k": "Evidence sources", "v": "Bookings, check-in, tickets" },
+        { "k": "Escalate above", "v": "₹50,000" },
+        { "k": "Approver", "v": "Arjun (Payments)" }
+      ]
+    }
+  ],
+  "rejected_text": "Rejected. Revlane will learn from this and won't propose the same fix this week.",
+  "agent_simulation": "With these rules it would have proposed **41 actions** in 90 days, recovering about **₹11.2L** for 260 credits.",
+  "autonomy": {
+    "earn_note": "Agents earn autonomy: 50+ proposals at 95% approval, then 30 days without incidents.",
+    "levels": [
+      { "label": "Observe", "note": "Observe: it diagnoses and reports, and proposes nothing." },
+      { "label": "Suggest", "note": "Suggest: every proposal waits for your approval." },
+      { "label": "Batch", "note": "Batch: you approve a type of action for a whole run or day." },
+      { "label": "Auto", "note": "Auto: it acts inside the limits you set and reports in a daily digest." }
+    ]
+  },
+  "leak_chart": {
+    "title": "Where it slipped away · last 7 days",
+    "gateway_split": [
+      { "name": "Razorpay", "amount_minor": 118000000 },
+      { "name": "PayU", "amount_minor": 74000000 },
+      { "name": "Cashfree", "amount_minor": 34000000 }
+    ]
+  },
+  "hourly_chart": {
+    "title": "Payment success by hour, Tuesday",
+    "note": "dip 2–4 pm",
+    "dip_below_pct": 85,
+    "hours": [
+      { "label": "10", "success_pct": 88.1 },
+      { "label": "11", "success_pct": 87.9 },
+      { "label": "12", "success_pct": 88.4 },
+      { "label": "13", "success_pct": 87.7 },
+      { "label": "14", "success_pct": 82.9 },
+      { "label": "15", "success_pct": 81.6 },
+      { "label": "16", "success_pct": 86.8 },
+      { "label": "17", "success_pct": 87.5 },
+      { "label": "18", "success_pct": 88.0 },
+      { "label": "19", "success_pct": 87.8 },
+      { "label": "20", "success_pct": 88.2 }
+    ]
+  },
+  "chat": {
+    "placeholder": "How can I help with your revenue today?",
+    "placeholder_with_file": "Ask about this file — e.g. reconcile it against our settlements",
+    "quick": [
+      { "label": "Where did we lose the most?", "question": "Where did we lose the most last week?" },
+      { "label": "Why did success drop?", "question": "Why did success drop on Tuesday?" },
+      { "label": "Audit our fees", "question": "Which gateway is cheapest for cards?" },
+      { "label": "Disputes due", "question": "Which disputes should we contest?" },
+      { "label": "Failed auto-debits", "question": "Why are subscription debits failing?" },
+      { "label": "Build a workflow", "question": "Build a workflow for failed bookings over ₹40K" }
+    ],
+    "recents": [
+      { "label": "Tuesday's success-rate drop", "question": "Why did success drop on Tuesday?" },
+      { "label": "Card fees by gateway", "question": "Which gateway is cheapest for cards?" },
+      { "label": "Disputes due this week", "question": "Which disputes should we contest?" },
+      { "label": "Membership auto-debits", "question": "Why are subscription debits failing?" },
+      { "label": "Booking rescue workflow", "question": "Build a workflow for failed bookings over ₹40K" }
+    ],
+    "attachments": {
+      "file": { "name": "HDFC_statement_Oct.csv", "kind": "CSV" },
+      "connection": { "name": "Shopify · October bookings", "kind": "LINK" }
+    },
+    "prompts": {
+      "create_skill": "Create a skill for our month-end close",
+      "start_routine": "Every Monday at 9 am, send last week's leakage by gateway to #finance on Slack",
+      "manage_routines": "Show my routines",
+      "build_workflow": "Build a workflow for failed bookings over ₹40K"
+    },
+    "thinking": {
+      "default": "Reading 41,280 attempts across 3 gateways…",
+      "file": "Reading HDFC_statement_Oct.csv and matching it against 3 gateways…",
+      "routines": "Checking your routines…",
+      "skill": "Drafting the skill…"
+    },
+    "routing": [
+      { "kind": "routines", "any": ["my routines", "manage routines"] },
+      { "kind": "routine", "any": ["every ", "schedule", "remind"] },
+      { "kind": "skill", "any": ["skill"] },
+      { "kind": "file", "attachment_kind": "CSV" },
+      { "kind": "wf", "any": ["workflow", "automate", "booking"] },
+      { "kind": "fee", "any": ["fee", "cheap", "charge", "mdr"] },
+      { "kind": "file", "any": ["reconcil", "settle", "statement"] },
+      { "kind": "cb", "any": ["dispute", "chargeback"] },
+      { "kind": "subs", "any": ["subscription", "debit", "mandate"] },
+      { "kind": "lost", "any": ["lost", "lose", "leak", "most", "summary"] },
+      { "kind": "routing", "any": ["routing", "gateway for"] },
+      { "kind": "drop", "any": ["drop", "why", "success", "fail"] }
+    ],
+    "replies": {
+      "drop": {
+        "steps": ["query_attempts", "baseline_anomaly", "root_cause_split", "rupee_impact"],
+        "block": "hourly",
+        "text": "Success fell from 87.6% to 82.9% between 2 and 4 pm on Tuesday. 71% of the drop came from UPI payments by HDFC Bank customers on Razorpay, which timed out at the bank; most of the rest was ICICI credit cards failing 3D Secure on PayU. About ₹9.4L slipped away, and 706 shoppers look recoverable.",
+        "rows": [
+          ["Segment", "Change", "Share of drop"],
+          ["UPI · HDFC Bank · Razorpay", "−9.1 pts", "71%"],
+          ["Card · ICICI · PayU", "−4.0 pts", "18%"],
+          ["Other", "—", "11%"]
+        ],
+        "source": "q_204, q_205 · 41,280 attempts · Razorpay, PayU, Cashfree · baseline: same hours, last 4 weeks",
+        "action_label": "Show me the recovery plan",
+        "action": "card:failure"
+      },
+      "lost": {
+        "steps": ["query_attempts", "three_way_match", "fee_check", "rupee_impact"],
+        "block": "chart",
+        "text": "₹22.6L slipped away last week across your three gateways, and ₹6.8L has already been recovered this month. Failed payments were the biggest leak, then sales lost on the weaker gateway for some banks, then paid bookings that never reached you. Four fixes are waiting for you.",
+        "source": "q_210 – q_215 · 3 gateways · HDFC statements · bookings",
+        "action_label": "Review the 4 fixes",
+        "action": "fixes"
+      },
+      "fee": {
+        "steps": ["settlement_lines", "contract_rates", "fee_check"],
+        "text": "On UPI, none of your providers charges you under your contracts. On domestic cards last month, PayU was cheapest at 1.86%, then Razorpay at 1.92% and Cashfree at 1.97%. Cashfree also charged 2.15% on Amex against a 2.00% contract: ₹2.6L in overcharges is ready to claim.",
+        "rows": [
+          ["Provider", "Cards, effective", "Overcharged"],
+          ["PayU", "1.86%", "₹0.6L"],
+          ["Razorpay", "1.92%", "₹0.4L"],
+          ["Cashfree", "1.97%", "₹1.6L"]
+        ],
+        "source": "q_220, q_221 · 1,912 settlement lines · Fee contracts 2026.pdf",
+        "action_label": "Show me the claims",
+        "action": "card:fees"
+      },
+      "file": {
+        "steps": ["read_file(HDFC_statement_Oct.csv)", "three_way_match", "settlement_lines"],
+        "text": "I matched the 1,204 credits in your HDFC statement against settlements from all three gateways. 98.7% match to the rupee. Three marketplace payouts arrived ₹1.2L short, and 40 paid bookings were auto-refunded because the order never confirmed — another ₹1.3L.",
+        "rows": [
+          ["Finding", "Items", "Amount"],
+          ["Marketplace payouts short", "3", "₹1.2L"],
+          ["Paid, auto-refunded", "40", "₹1.3L"],
+          ["Captured, not yet settled", "22", "₹0.6L"]
+        ],
+        "source": "HDFC_statement_Oct.csv · 1,204 rows · matched by UTR",
+        "action_label": "Show me the fix",
+        "action": "card:recon"
+      },
+      "cb": {
+        "steps": ["get_disputes", "win_odds", "evidence_pack"],
+        "text": "Five disputes are due within 48 hours. Three are worth contesting: the payments passed 3D Secure and the customers travelled. The other two have no proof of travel, so accepting them saves handling cost.",
+        "rows": [
+          ["Dispute", "Win odds", "Amount"],
+          ["DP-2291", "78%", "₹46,200"],
+          ["DP-2296", "74%", "₹38,900"],
+          ["DP-2301", "69%", "₹41,500"]
+        ],
+        "source": "Disputes from PayU and Razorpay · bookings · check-in records",
+        "action_label": "Show me the responses",
+        "action": "card:chargeback"
+      },
+      "subs": {
+        "steps": ["mandate_failures", "retry_timing"],
+        "text": "212 membership auto-debits failed this month. 61% were insufficient funds in the first three days, so retrying after the 5th should recover most of them. The rest need a card update or a new mandate.",
+        "rows": [
+          ["Reason", "Count", "Plan"],
+          ["Insufficient funds", "129", "Retry after 5th"],
+          ["Expired card", "48", "Update link"],
+          ["Mandate revoked", "35", "Re-register"]
+        ],
+        "source": "Mandates on Razorpay and Cashfree · Acme Plus members",
+        "action_label": "Show me the plan",
+        "action": "card:subs"
+      },
+      "routing": {
+        "steps": ["success_matrix", "rupee_impact"],
+        "text": "ICICI credit cards succeed 6.2 points more often on PayU than on Razorpay this week. Moving that traffic would lift overall card success by about 1.8 points, worth roughly ₹1.9L a week.",
+        "agent_key": "routing"
+      },
+      "wf": {
+        "steps": ["draft_workflow", "list_tools(acme-inventory)", "simulate(90d)"],
+        "block": "workflow",
+        "text": "Here is a draft. When a booking payment of ₹40,000 or more fails, it checks the seat in your inventory system and holds it for 30 minutes, then sends a UPI or EMI link once you approve. Paid: it confirms the booking and posts to your ledger. Not paid: it releases the seat and alerts sales on Slack."
+      },
+      "routine": {
+        "steps": ["create_routine"],
+        "block": "routine",
+        "text": "Set up as a routine: every Monday at 9:00 I will compile last week's leakage by gateway and by cause and post it to #finance on Slack, with links to any fixes waiting for approval."
+      },
+      "routines": {
+        "steps": ["list_routines"],
+        "block": "routines",
+        "text": "Here are your routines. You can run any of them now or pause them, right here."
+      },
+      "skill": {
+        "steps": ["draft_skill"],
+        "block": "skill",
+        "text": "Here is a draft skill from what you described. Skills are written instructions that chat and your agents follow every time. Edit it, then save."
+      },
+      "none": {
+        "steps": [],
+        "text": "This prototype answers a few sample questions. Try a suggestion, attach a file with +, or ask about failures, fees, settlements, disputes, subscriptions or a workflow."
+      }
+    },
+    "actions": {
+      "fixes": {
+        "step": "list_proposals",
+        "text": "Here are the fixes waiting for you. Approve them right here; anything you approve starts running straight away.",
+        "empty_text": "Nothing is waiting. Every fix has been decided."
+      },
+      "card": {
+        "text": "Here is the plan. You can approve it, change its rules first, or reject it."
+      }
+    }
+  },
+  "notifications": [
+    {
+      "title": "Weekly summary",
+      "body": "₹22.6L slipped away last week · ₹6.8L recovered · 4 fixes waiting",
+      "time": "Today, 8:00",
+      "dot": "#D97757",
+      "question": "Where did we lose the most last week?"
+    },
+    {
+      "title": "HDFC Bank UPI degraded on Razorpay",
+      "body": "Success fell 9.1 points, Tue 2–4 pm. ₹9.4L lost.",
+      "time": "Tuesday, 16:05",
+      "dot": "#D97757",
+      "question": "Why did success drop on Tuesday?"
+    },
+    {
+      "title": "5 disputes due in 48 hours",
+      "body": "3 look winnable. Responses are drafted.",
+      "time": "Yesterday",
+      "dot": "#C9C5B7",
+      "question": "Which disputes should we contest?"
+    }
+  ],
+  "skills": ["Refund policy v3", "Tone of voice", "EMI rules", "Dispute evidence checklist"],
+  "skill_draft": {
+    "name": "Month-end close",
+    "instructions": "Close the books by the 3rd working day. Reconcile every gateway against HDFC credits. Flag any gap over ₹10,000 to the CFO with the settlement lines attached. Never auto-post entries above ₹5L.",
+    "applies_to": ["Reconciliation", "Fee audit", "Chat"],
+    "saved_text": "Saved. It's now in + → Use a skill, and Reconciliation and Fee audit will follow it."
+  },
+  "routine_draft": {
+    "name": "Weekly leakage report",
+    "when": "Mondays 9:00 · all gateways · posts to #finance on Slack",
+    "saved_label": "Saved · first run Monday"
+  },
+  "routines": [
+    { "id": "weekly", "name": "Weekly leakage report", "when": "Mondays 9:00 · posts to #finance on Slack", "requires_saved_draft": true },
+    { "id": "close", "name": "Daily close", "when": "Every day 7:00 · reconcile and post to Zoho Books", "requires_saved_draft": false },
+    { "id": "fees", "name": "Fee claims", "when": "1st of every month · Fee audit agent", "requires_saved_draft": false },
+    { "id": "dl", "name": "Dispute deadline check", "when": "Every day 10:00 · WhatsApp to Arjun", "requires_saved_draft": false }
+  ],
+  "workflow_draft": {
+    "name": "High-value booking rescue",
+    "status": "Draft",
+    "published_status": "Waiting for 2 approvers",
+    "steps": [
+      { "title": "When a booking payment of ₹40,000+ fails", "sub": "trigger: payment_attempt.failed · any gateway", "tag": "Trigger", "tone": "base" },
+      { "title": "Check the seat", "sub": "acme-inventory.check_seat", "tag": "Your tool", "tone": "tool" },
+      { "title": "Hold it 30 minutes, or alert sales if none", "sub": "acme-inventory.hold_seat", "tag": "Your tool", "tone": "tool" },
+      { "title": "Send a UPI or EMI link", "sub": "agent: failed_payment_recovery · WhatsApp", "tag": "Needs approval", "tone": "approval" },
+      { "title": "Wait up to 30 minutes for payment", "sub": "wait_for: payment_attempt.succeeded", "tag": "Revlane", "tone": "agent" },
+      { "title": "Paid: confirm and post. Not paid: release and alert #bookings", "sub": "revlane.post_ledger · slack.post", "tag": "Revlane + Slack", "tone": "agent" }
+    ],
+    "simulation": "Last 90 days: 52 bookings matched and seats were free for 46. It would have rescued about **38 bookings worth ₹14.6L** for 212 credits.",
+    "published_text": "Sent to Priya (Finance) and Arjun (Payments). It goes live at the Suggest level once both approve."
+  },
+  "workflows": [
+    { "name": "High-value booking rescue", "sub": "Built in chat · uses your inventory tool", "status": "Draft", "is_draft": true },
+    { "name": "Failed-payment rescue", "sub": "Template · payments over ₹10,000", "status": "Live", "is_draft": false },
+    { "name": "Dispute desk", "sub": "Template · evidence from bookings and tickets", "status": "Live", "is_draft": false }
+  ],
+  "connections": [
+    { "name": "Razorpay", "kind": "Gateway", "status": "Connected", "detail": "Payments, settlements, payment links · MCP + API", "on": true },
+    { "name": "PayU", "kind": "Gateway", "status": "Connected", "detail": "Transactions, settlements, chargebacks · MCP + API", "on": true },
+    { "name": "Cashfree", "kind": "Gateway", "status": "Connected", "detail": "Orders, payments, refunds, settlements · MCP + API", "on": true },
+    { "name": "HDFC Bank", "kind": "Bank", "status": "Daily", "detail": "Statements matched to settlements by UTR", "on": true },
+    { "name": "Shopify", "kind": "Orders", "status": "Connected", "detail": "Bookings, cancellations, fulfilment", "on": true },
+    { "name": "Zoho Books", "kind": "Accounting", "status": "Connected", "detail": "Posts reconciled entries", "on": true },
+    { "name": "Slack", "kind": "Messaging", "status": "Connected", "detail": "#finance, #payments, #bookings", "on": true },
+    { "name": "WhatsApp", "kind": "Messaging", "status": "Connected", "detail": "4 approved templates", "on": true },
+    { "name": "Salesforce", "kind": "CRM", "status": "Available", "detail": "Customer tier for recovery priority", "on": false },
+    { "name": "BigQuery", "kind": "Warehouse", "status": "Available", "detail": "Bring your own data; export Revlane data", "on": false }
+  ],
+  "custom_mcp": {
+    "default_url": "https://mcp.acme-travel.internal/inventory",
+    "found": "acme-inventory · 4 tools found",
+    "tools": [
+      { "name": "check_seat", "permission": "Read", "on": true },
+      { "name": "hold_seat", "permission": "Needs approval", "on": true },
+      { "name": "release_seat", "permission": "Needs approval", "on": true },
+      { "name": "cancel_booking", "permission": "Blocked", "on": false }
+    ]
+  }
+}

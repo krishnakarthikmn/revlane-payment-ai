@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Revlane prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F5;color:#1F1E1D;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#A84A2B}a:hover{color:#7A3319}
+.rv *{box-sizing:border-box}
+.serif{font-family:Newsreader,Georgia,serif;font-weight:400;letter-spacing:-0.012em}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.muted{color:#6B6A63}
+.eyebrow{font-size:11.5px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:#6B6A63}
+.card{background:#FFFFFF;border:1px solid #EAE7DE;border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(31,30,29,.03)}
+.soft{background:#F4F2EC;border-radius:12px;padding:14px 16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 15px;border-radius:10px;border:1px solid #DEDAD0;background:#FFFFFF;color:#1F1E1D;font:500 13.5px Inter,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:#F4F2EC;border-color:#CFCBBF}
+.btnp{background:#1F1E1D;border-color:#1F1E1D;color:#FAF9F5}
+.btnp:hover{background:#34332F;border-color:#34332F}
+.btnc{background:#D97757;border-color:#D97757;color:#1F1E1D}
+.btnc:hover{background:#C96A4B;border-color:#C96A4B}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border-radius:12px;border:1px solid #E6E3D9;background:#FFFFFF;color:#3D3C38;font:400 14px Inter,sans-serif;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.chip:hover{background:#FFFFFF;border-color:#D97757;transform:translateY(-1px)}
+.side{display:flex;align-items:center;gap:12px;width:100%;min-height:38px;padding:0 10px;border-radius:10px;border:0;background:transparent;color:#3D3C38;font:400 14px Inter,sans-serif;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden}
+.side:hover{background:#EBE8DF}
+.icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;border:0;background:transparent;cursor:pointer}
+.icon:hover{background:#EFECE4}
+.composer{position:relative;background:#FFFFFF;border:1px solid #E3E0D6;border-radius:22px;padding:14px 12px 10px 18px;box-shadow:0 2px 6px rgba(31,30,29,.03),0 12px 32px rgba(31,30,29,.05);transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:#D4CFC2;box-shadow:0 2px 6px rgba(31,30,29,.04),0 16px 40px rgba(31,30,29,.08)}
+.composer input.main{width:100%;min-height:34px;border:0;outline:0;background:transparent;color:#1F1E1D;font:400 16px Inter,sans-serif;padding:4px 2px}
+.composer input.main::placeholder{color:#8F8D85}
+.send{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;border:0;background:#D97757;cursor:pointer;transition:background .15s}
+.send:hover{background:#C96A4B}
+.menu{position:absolute;left:10px;bottom:58px;width:320px;background:#FFFFFF;border:1px solid #E3E0D6;border-radius:16px;box-shadow:0 16px 40px rgba(31,30,29,.14);padding:6px;z-index:5;animation:rise .18s ease-out}
+.mi{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:8px 10px;border:0;border-radius:10px;background:transparent;color:#1F1E1D;font:400 14px Inter,sans-serif;cursor:pointer;text-align:left}
+.mi:hover{background:#F4F2EC}
+.mi .ic{width:32px;height:32px;border-radius:9px;background:#F4F2EC;display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px}
+.track{height:6px;border-radius:999px;background:#EFEDE5;overflow:hidden}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.line{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid #F1EFE8;font-size:14px}
+.att{display:inline-flex;align-items:center;gap:8px;padding:5px 6px 5px 10px;border:1px solid #EAE7DE;border-radius:10px;background:#FAF9F5;font-size:13px}
+.x{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:6px;background:transparent;cursor:pointer;color:#6B6A63;font-size:16px}
+.x:hover{background:#EBE8DF}
+.rise{animation:rise .35s ease-out}
+.fld{width:100%;min-height:40px;padding:8px 12px;border:1px solid #DEDAD0;border-radius:10px;font:400 14px Inter,sans-serif;color:#1F1E1D;background:#FFFFFF}
+.fld:focus{outline:2px solid #D97757;outline-offset:1px}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spin{animation:spin 2.4s linear infinite;transform-origin:50% 50%}
+</style>
+</helmet>
+<div class="rv" style="display: flex; min-height: 100vh; background: #FAF9F5">
+
+<nav aria-label="Main" style="flex: 0 0 {{navW}}; position: relative; transition: flex-basis .2s ease">
+<div onMouseEnter="{{hoverOn}}" onMouseLeave="{{hoverOff}}" style="position: sticky; top: 0; height: 100vh; width: {{panelW}}; background: #F4F2EC; display: flex; flex-direction: column; gap: 2px; padding: 12px 10px; z-index: 20; transition: width .2s ease, box-shadow .2s; overflow: hidden; {{panelShadow}}">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 4px 14px 6px; min-height: 48px">
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{true}}">
+<span style="display: flex; align-items: center; gap: 10px"><svg width="24" height="24" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="#1F1E1D"></circle><path d="M7 16.5 C10 16.5 10 9.5 13 9.5 C16 9.5 16 16.5 19 16.5" stroke="#D97757" stroke-width="2.2" fill="none" stroke-linecap="round"></path></svg><span class="serif" style="font-size: 21px">Revlane</span></span>
+</sc-if>
+<button class="icon" type="button" aria-label="{{pinLabel}}" title="{{pinLabel}}" onClick="{{togglePin}}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3" stroke="#3D3C38" stroke-width="1.6" fill="none"></rect><path d="M9.5 4.5 V19.5" stroke="#3D3C38" stroke-width="1.6"></path></svg></button>
+</div>
+<button class="side" type="button" onClick="{{newChat}}" title="New chat" style="font-weight: 500; color: #1F1E1D"><span style="width: 26px; height: 26px; border-radius: 13px; background: #D97757; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 26px"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 V11 M1 6 H11" stroke="#1F1E1D" stroke-width="1.8" stroke-linecap="round"></path></svg></span><sc-if value="{{showLabels}}" hint-placeholder-val="{{true}}"><span>New chat</span></sc-if></button>
+<div style="height: 6px"></div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="5">
+<button class="side" type="button" title="{{n.label}}" style="{{n.style}}" onClick="{{n.go}}"><span style="width: 26px; display: inline-flex; justify-content: center; flex: 0 0 26px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="{{n.icon}}" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><sc-if value="{{showLabels}}" hint-placeholder-val="{{true}}"><span style="flex: 1 1 auto">{{n.label}}</span><sc-if value="{{n.hasBadge}}" hint-placeholder-val="{{false}}"><span class="pill num" style="background: #F5E2D7; color: #7A3319">{{n.badge}}</span></sc-if></sc-if></button>
+</sc-for>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{true}}">
+<div class="muted" style="font-size: 12px; padding: 20px 10px 6px">Recents</div>
+<sc-for list="{{recents}}" as="r" hint-placeholder-count="5">
+<button class="side" type="button" onClick="{{r.go}}" style="color: #4A4944; text-overflow: ellipsis">{{r.label}}</button>
+</sc-for>
+</sc-if>
+<div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 6px 4px">
+<span style="width: 32px; height: 32px; border-radius: 16px; background: #1F1E1D; color: #FAF9F5; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex: 0 0 32px">P</span>
+<sc-if value="{{showLabels}}" hint-placeholder-val="{{true}}"><span style="display: flex; flex-direction: column; white-space: nowrap"><span style="font-size: 14px; font-weight: 500">Priya Menon</span><span class="muted" style="font-size: 12px">Acme Travel · Finance</span></span></sc-if>
+</div>
+</div>
+</nav>
+
+<main style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; min-height: 100vh">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; position: relative">
+<span style="font-size: 14px; color: #4A4944">{{title}}</span>
+<div style="display: flex; align-items: center; gap: 6px; position: relative">
+<span class="pill" style="background: #EFECE4; color: #4A4944">Sample data</span>
+<button class="icon" type="button" aria-label="Notifications" onClick="{{toggleNotif}}" style="position: relative"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16 V11 A6 6 0 0 1 18 11 V16 L20 18 H4 Z M10 21 H14" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"></path></svg><sc-if value="{{hasUnread}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; border-radius: 4px; background: #D97757; border: 2px solid #FAF9F5"></span></sc-if></button>
+<sc-if value="{{notifOpen}}" hint-placeholder-val="{{false}}">
+<div class="rise" style="position: absolute; right: 0; top: 46px; width: 380px; background: #FFFFFF; border: 1px solid #E3E0D6; border-radius: 16px; box-shadow: 0 16px 40px rgba(31,30,29,.14); padding: 6px; z-index: 30">
+<div class="eyebrow" style="padding: 10px 10px 6px">Notifications</div>
+<sc-for list="{{notifs}}" as="nt" hint-placeholder-count="3">
+<button class="mi" type="button" onClick="{{nt.go}}" style="align-items: flex-start"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{nt.dot}}; margin-top: 7px; flex: 0 0 8px"></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">{{nt.title}}</span><span class="muted" style="font-size: 13px; line-height: 1.45">{{nt.body}}</span><span class="muted" style="font-size: 12px">{{nt.time}}</span></span></button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</header>
+
+<sc-if value="{{isChat}}" hint-placeholder-val="{{true}}">
+<div style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; padding: 0 24px 24px">
+<div style="width: 100%; max-width: 740px; display: flex; flex-direction: column; gap: 28px; flex: 1 1 auto; {{chatPad}}">
+
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{true}}">
+<div class="rise" style="display: flex; flex-direction: column; align-items: center; gap: 22px">
+<button type="button" onClick="{{openSummary}}" style="display: inline-flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 6px 0 6px; border-radius: 999px; border: 1px solid #E6E3D9; background: #FFFFFF; font: 400 13px Inter, sans-serif; color: #3D3C38; cursor: pointer; box-shadow: 0 1px 2px rgba(31,30,29,.04)"><span class="pill" style="background: #F5E2D7; color: #7A3319">Weekly summary</span>₹22.6L slipped away · 4 fixes waiting<span style="padding-right: 8px" aria-hidden="true">→</span></button>
+<h1 class="serif" style="margin: 0; font-size: 46px; display: flex; align-items: center; gap: 16px; font-weight: 400"><svg class="spin" width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L13.6 10.4 L22 12 L13.6 13.6 L12 22 L10.4 13.6 L2 12 L10.4 10.4 Z" fill="#D97757"></path></svg>Good morning, Priya</h1>
+</div>
+</sc-if>
+
+<sc-for list="{{messages}}" as="m" hint-placeholder-count="0">
+<sc-if value="{{m.isUser}}" hint-placeholder-val="{{false}}">
+<div class="rise" style="align-self: flex-end; max-width: 80%; display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+<sc-if value="{{m.hasFiles}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end"><sc-for list="{{m.files}}" as="f" hint-placeholder-count="1"><span class="att" style="padding-right: 10px"><span class="pill mono" style="background: {{f.bg}}; color: {{f.fg}}; padding: 2px 6px">{{f.kind}}</span>{{f.name}}</span></sc-for></div></sc-if>
+<div style="background: #F0EDE5; color: #1F1E1D; padding: 11px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5">{{m.text}}</div>
+</div>
+</sc-if>
+<sc-if value="{{m.isBot}}" hint-placeholder-val="{{false}}">
+<div class="rise" style="display: flex; gap: 14px; align-items: flex-start">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><path d="M12 2 L13.6 10.4 L22 12 L13.6 13.6 L12 22 L10.4 13.6 L2 12 L10.4 10.4 Z" fill="#D97757"></path></svg>
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<sc-if value="{{m.hasSteps}}" hint-placeholder-val="{{false}}">
+<details style="font-size: 13px; color: #6B6A63"><summary style="cursor: pointer; min-height: 24px">{{m.stepsLabel}}</summary><div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px"><sc-for list="{{m.steps}}" as="s" hint-placeholder-count="3"><span class="pill mono" style="background: #F4F2EC; color: #3D3C38; font-weight: 400">{{s}}</span></sc-for></div></details>
+</sc-if>
+<div class="serif" style="font-size: 18.5px; line-height: 1.65; color: #1F1E1D">{{m.text}}</div>
+
+<sc-if value="{{m.hasChart}}" hint-placeholder-val="{{false}}">
+<figure class="card" style="margin: 0; padding: 22px 22px 18px">
+<figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px"><span class="serif" style="font-size: 18px">{{m.chartTitle}}</span><span class="muted num" style="font-size: 13px">{{m.chartTotal}}</span></figcaption>
+<div style="display: flex; height: 12px; border-radius: 999px; overflow: hidden; gap: 2px; margin-bottom: 16px"><sc-for list="{{m.chart}}" as="b" hint-placeholder-count="6"><span style="display: block; background: {{b.color}}; width: {{b.share}}"></span></sc-for></div>
+<sc-for list="{{m.chart}}" as="b" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) 64px; gap: 14px; align-items: center; padding: 7px 0">
+<span style="font-size: 14px; display: flex; align-items: center; gap: 8px"><span style="width: 9px; height: 9px; border-radius: 3px; background: {{b.color}}; flex: 0 0 9px"></span>{{b.label}}</span>
+<span style="height: 10px; border-radius: 999px; background: #F1EFE8; overflow: hidden"><span style="display: block; height: 10px; border-radius: 999px; background: {{b.color}}; width: {{b.w}}"></span></span>
+<span class="num" style="font-size: 14px; font-weight: 500; text-align: right">{{b.amt}}</span>
+</div>
+</sc-for>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #F1EFE8"><sc-for list="{{m.split}}" as="g" hint-placeholder-count="3"><span style="font-size: 13px"><span class="muted">{{g.name}}</span> <span class="num" style="font-weight: 500">{{g.amt}}</span></span></sc-for></div>
+</figure>
+</sc-if>
+
+<sc-if value="{{m.hasCols}}" hint-placeholder-val="{{false}}">
+<figure class="card" style="margin: 0; padding: 22px 22px 16px">
+<figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px"><span class="serif" style="font-size: 18px">Payment success by hour, Tuesday</span><span class="muted" style="font-size: 13px">dip 2–4 pm</span></figcaption>
+<div style="display: flex; align-items: flex-end; gap: 8px; height: 150px; border-bottom: 1px solid #EAE7DE">
+<sc-for list="{{m.cols}}" as="c" hint-placeholder-count="11">
+<div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 150px"><span class="num" style="font-size: 11px; color: {{c.labelColor}}">{{c.val}}</span><span style="display: block; width: 100%; max-width: 34px; height: {{c.h}}; background: {{c.color}}; border-radius: 6px 6px 2px 2px"></span></div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px; margin-top: 6px"><sc-for list="{{m.cols}}" as="c" hint-placeholder-count="11"><span class="muted num" style="flex: 1 1 0; text-align: center; font-size: 11px">{{c.label}}</span></sc-for></div>
+</figure>
+</sc-if>
+
+<sc-if value="{{m.hasRows}}" hint-placeholder-val="{{false}}">
+<div class="card" style="padding: 4px 20px">
+<sc-for list="{{m.rows}}" as="r" hint-placeholder-count="3">
+<div class="line num" style="{{r.style}}"><span style="flex: 1 1 auto">{{r.a}}</span><span style="flex: 0 0 120px; text-align: right">{{r.b}}</span><span style="flex: 0 0 100px; text-align: right; font-weight: 500">{{r.c}}</span></div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasFixes}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{m.fixes}}" as="fx" hint-placeholder-count="4">
+<div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="display: flex; align-items: center; gap: 10px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{fx.color}}"></span><span style="font-weight: 500">{{fx.name}}</span><span class="muted num" style="font-size: 13px">{{fx.amt}} at stake</span></span><span class="pill" style="{{fx.statusStyle}}">{{fx.statusLabel}}</span></div>
+<div style="font-size: 14px; line-height: 1.55; color: #3D3C38">{{fx.proposal}}</div>
+<sc-if value="{{fx.isPending}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="btn btnc" type="button" onClick="{{fx.approve}}">Approve</button><button class="btn" type="button" onClick="{{fx.details}}">Details</button><button class="btn" type="button" onClick="{{fx.reject}}">Reject</button></div></sc-if>
+<sc-if value="{{fx.isDone}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span class="muted" style="font-size: 13px; flex: 1 1 260px">{{fx.doneText}}</span><button class="btn" type="button" onClick="{{fx.undo}}">Undo</button></div></sc-if>
+</div>
+</sc-for>
+<div class="muted" style="font-size: 13px">{{m.fixFooter}}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasAgent}}" hint-placeholder-val="{{false}}">
+<div class="card" style="padding: 0; overflow: hidden">
+<div style="padding: 20px 22px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 1px solid #F1EFE8">
+<div><div class="eyebrow">{{m.ag.family}} agent</div><div class="serif" style="font-size: 22px; margin-top: 4px">{{m.ag.name}}</div></div>
+<div style="text-align: right"><div class="serif num" style="font-size: 28px; line-height: 1">{{m.ag.amt}}</div><span class="pill" style="{{m.ag.statusStyle}}; margin-top: 6px">{{m.ag.statusLabel}}</span></div>
+</div>
+<div style="padding: 16px 22px">
+<div class="eyebrow" style="margin-bottom: 4px">Why it happened</div>
+<sc-for list="{{m.ag.causes}}" as="c" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 40px; gap: 12px; align-items: center; padding: 6px 0; font-size: 13.5px"><span>{{c.label}}</span><span class="track"><span style="display: block; height: 6px; border-radius: 999px; background: #D97757; width: {{c.w}}"></span></span><span class="num" style="text-align: right">{{c.pct}}</span></div>
+</sc-for>
+</div>
+<div style="padding: 16px 22px; background: #FAF9F5; border-top: 1px solid #F1EFE8; display: flex; flex-direction: column; gap: 12px">
+<div class="eyebrow">Proposed fix</div>
+<div class="serif" style="font-size: 17.5px; line-height: 1.55">{{m.ag.proposal}}</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px"><sc-for list="{{m.ag.meta}}" as="mt" hint-placeholder-count="4"><div style="background: #FFFFFF; border: 1px solid #EAE7DE; border-radius: 12px; padding: 10px 12px"><div class="muted" style="font-size: 12px">{{mt.k}}</div><div class="num" style="font-size: 14px; font-weight: 500; margin-top: 2px">{{mt.v}}</div></div></sc-for></div>
+<sc-if value="{{m.ag.isPending}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="btn btnc" type="button" onClick="{{m.ag.approve}}">Approve</button><button class="btn" type="button" onClick="{{m.ag.edit}}">Edit rules</button><button class="btn" type="button" onClick="{{m.ag.reject}}">Reject</button><button class="btn" type="button" onClick="{{m.ag.openPage}}" style="margin-left: auto; border-color: transparent; background: transparent">Open agent ↗</button></div></sc-if>
+<sc-if value="{{m.ag.isDone}}" hint-placeholder-val="{{false}}"><div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span style="font-size: 14px; flex: 1 1 280px; line-height: 1.5">{{m.ag.doneText}}</span><button class="btn" type="button" onClick="{{m.ag.undo}}">Undo</button></div></sc-if>
+<sc-if value="{{m.ag.editing}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; padding-top: 6px"><sc-for list="{{m.ag.settings}}" as="st" hint-placeholder-count="4"><div><label class="muted" style="font-size: 12px" for="{{st.id}}">{{st.k}}</label><input id="{{st.id}}" class="fld" style="margin-top: 4px" defaultValue="{{st.v}}"></div></sc-for></div>
+<div style="display: flex; gap: 8px"><button class="btn btnp" type="button" onClick="{{simulateAgent}}">Simulate on 90 days</button><button class="btn" type="button" onClick="{{m.ag.edit}}">Done</button></div>
+<sc-if value="{{agentSimulated}}" hint-placeholder-val="{{false}}"><div class="soft" style="font-size: 14px">With these rules it would have proposed <b>41 actions</b> in 90 days, recovering about <b>₹11.2L</b> for 260 credits.</div></sc-if>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasWf}}" hint-placeholder-val="{{false}}">
+<div class="card" style="padding: 20px 22px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px"><span class="serif" style="font-size: 19px">High-value booking rescue</span><span class="pill" style="{{wfStatusStyle}}">{{wfStatus}}</span></div>
+<sc-for list="{{wfSteps}}" as="ws" hint-placeholder-count="6">
+<div style="display: flex; gap: 14px; align-items: stretch"><div style="flex: 0 0 28px; display: flex; flex-direction: column; align-items: center"><span class="num" style="width: 28px; height: 28px; border-radius: 14px; background: {{ws.bg}}; color: {{ws.fg}}; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{ws.n}}</span><span style="flex: 1 1 auto; width: 1px; background: #E3E0D6"></span></div><div style="flex: 1 1 auto; padding: 3px 0 14px"><div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span style="font-weight: 500; font-size: 14px">{{ws.title}}</span><span class="pill" style="background: {{ws.bg}}; color: {{ws.fg}}">{{ws.tag}}</span></div><div class="muted mono" style="font-size: 11.5px; margin-top: 3px">{{ws.sub}}</div></div></div>
+</sc-for>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="btn" type="button" onClick="{{simulateWf}}">Simulate on 90 days</button><button class="btn btnp" type="button" onClick="{{publishWf}}">Request approval</button><button class="btn" type="button" onClick="{{goWorkflows}}" style="margin-left: auto; border-color: transparent; background: transparent">Open in Workflows ↗</button></div>
+<sc-if value="{{wfSimulated}}" hint-placeholder-val="{{false}}"><div class="soft" style="font-size: 14px; line-height: 1.55; margin-top: 12px">Last 90 days: 52 bookings matched and seats were free for 46. It would have rescued about <b>38 bookings worth ₹14.6L</b> for 212 credits.</div></sc-if>
+<sc-if value="{{wfPublished}}" hint-placeholder-val="{{false}}"><div class="soft" style="font-size: 14px; margin-top: 12px; background: #F5E2D7; color: #5C2814">Sent to Priya (Finance) and Arjun (Payments). It goes live at the Suggest level once both approve.</div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasRoutine}}" hint-placeholder-val="{{false}}">
+<div class="card" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 16px 18px">
+<span style="width: 40px; height: 40px; border-radius: 12px; background: #F4F2EC; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#3D3C38" stroke-width="1.6" fill="none"></circle><path d="M12 7.5 V12 L15 14" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></span>
+<span style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">Weekly leakage report</span><span class="muted" style="font-size: 13px">Mondays 9:00 · all gateways · posts to #finance on Slack</span></span>
+<sc-if value="{{routineSaved}}" hint-placeholder-val="{{false}}"><span class="pill" style="background: #E3EDE5; color: #23513A">Saved · first run Monday</span></sc-if>
+<sc-if value="{{routineUnsaved}}" hint-placeholder-val="{{true}}"><button class="btn btnp" type="button" onClick="{{saveRoutine}}">Save routine</button></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasRoutines}}" hint-placeholder-val="{{false}}">
+<div class="card" style="padding: 6px 20px">
+<sc-for list="{{routines}}" as="rt" hint-placeholder-count="4">
+<div class="line" style="align-items: center; padding: 14px 0; {{rt.first}}"><span style="display: flex; flex-direction: column; gap: 3px; flex: 1 1 auto"><span style="font-weight: 500">{{rt.name}}</span><span class="muted" style="font-size: 13px">{{rt.when}}</span></span><span class="pill" style="{{rt.style}}">{{rt.status}}</span><button class="btn" type="button" onClick="{{rt.run}}">Run now</button><button class="btn" type="button" onClick="{{rt.toggle}}">{{rt.toggleLabel}}</button></div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasSkill}}" hint-placeholder-val="{{false}}">
+<div class="card" style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 36px; height: 36px; border-radius: 10px; background: #1F1E1D; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4 H15 L19 8 V20 H5 Z M9 12 H15 M9 16 H13" stroke="#FAF9F5" stroke-width="1.7" fill="none" stroke-linejoin="round" stroke-linecap="round"></path></svg></span><span class="eyebrow">New skill · draft</span></div>
+<div><label class="muted" style="font-size: 12px" for="skname">Name</label><input id="skname" class="fld" style="margin-top: 4px" defaultValue="Month-end close"></div>
+<div><label class="muted" style="font-size: 12px" for="skrules">Instructions</label><textarea id="skrules" class="fld" style="margin-top: 4px; min-height: 96px; resize: vertical; line-height: 1.55" defaultValue="Close the books by the 3rd working day. Reconcile every gateway against HDFC credits. Flag any gap over ₹10,000 to the CFO with the settlement lines attached. Never auto-post entries above ₹5L."></textarea></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center"><span class="muted" style="font-size: 12px">Applies to</span><span class="att" style="padding-right: 10px">Reconciliation</span><span class="att" style="padding-right: 10px">Fee audit</span><span class="att" style="padding-right: 10px">Chat</span></div>
+<sc-if value="{{skillUnsaved}}" hint-placeholder-val="{{true}}"><div><button class="btn btnp" type="button" onClick="{{saveSkill}}">Save skill</button></div></sc-if>
+<sc-if value="{{skillSaved}}" hint-placeholder-val="{{false}}"><div class="soft" style="font-size: 14px">Saved. It's now in + → Use a skill, and Reconciliation and Fee audit will follow it.</div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{m.hasSource}}" hint-placeholder-val="{{false}}"><div class="muted mono" style="font-size: 11.5px">{{m.source}}</div></sc-if>
+<sc-if value="{{m.hasAction}}" hint-placeholder-val="{{false}}"><div><button class="btn" type="button" onClick="{{m.act}}">{{m.actionLabel}}</button></div></sc-if>
+</div>
+</div>
+</sc-if>
+</sc-for>
+<sc-if value="{{thinking}}" hint-placeholder-val="{{false}}">
+<div class="rise" style="display: flex; gap: 14px; align-items: center"><svg class="spin" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L13.6 10.4 L22 12 L13.6 13.6 L12 22 L10.4 13.6 L2 12 L10.4 10.4 Z" fill="#D97757"></path></svg><span class="muted" style="font-size: 14px">{{thinkingText}}</span></div>
+</sc-if>
+
+<div style="{{composerWrap}}">
+<div class="composer">
+<sc-if value="{{hasAttach}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px">
+<sc-for list="{{attach}}" as="a" hint-placeholder-count="1"><span class="att"><span class="pill mono" style="background: {{a.bg}}; color: {{a.fg}}; padding: 2px 6px">{{a.kind}}</span>{{a.name}}<button class="x" type="button" aria-label="Remove" onClick="{{a.remove}}">×</button></span></sc-for>
+</div>
+</sc-if>
+<label for="chatin" style="position: absolute; left: -9999px">Message Revlane</label>
+<input id="chatin" class="main" placeholder="{{placeholder}}" value="{{draft}}" onChange="{{onDraft}}" onKeyDown="{{onKey}}">
+<div style="display: flex; align-items: center; gap: 4px; margin-top: 8px">
+<button class="icon" type="button" aria-label="Add files, skills or routines" onClick="{{togglePlus}}" style="border: 1px solid #E3E0D6; width: 34px; height: 34px"><svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 V14 M2 8 H14" stroke="#3D3C38" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+<button class="icon" type="button" aria-label="Routines" title="Routines" onClick="{{manageRoutines}}" style="width: 34px; height: 34px"><svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#3D3C38" stroke-width="1.6" fill="none"></circle><path d="M12 7.5 V12 L15 14" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></button>
+<span style="flex: 1 1 auto"></span>
+<span style="font-size: 13px; color: #4A4944; padding: 0 10px">Revlane · Acme data</span>
+<button class="send" type="button" aria-label="Send" onClick="{{sendDraft}}"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19 L12 5 M5 12 L12 5 L19 12" stroke="#FFFFFF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+</div>
+<sc-if value="{{plusOpen}}" hint-placeholder-val="{{false}}">
+<div class="menu">
+<button class="mi" type="button" onClick="{{addFile}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3 H7 A2 2 0 0 0 5 5 V19 A2 2 0 0 0 7 21 H17 A2 2 0 0 0 19 19 V8 Z M14 3 V8 H19" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linejoin="round"></path></svg></span><span style="display: flex; flex-direction: column"><span>Upload a file</span><span class="muted" style="font-size: 12px">Statements, settlement reports, contracts</span></span></button>
+<button class="mi" type="button" onClick="{{addConnection}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 H7 A5 5 0 0 0 7 17 H9 M15 7 H17 A5 5 0 0 1 17 17 H15 M8 12 H16" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></span><span style="display: flex; flex-direction: column"><span>Add from connections</span><span class="muted" style="font-size: 12px">Shopify, Zoho Books, BigQuery, your MCP</span></span></button>
+<div style="height: 1px; background: #F1EFE8; margin: 4px 8px"></div>
+<button class="mi" type="button" onClick="{{toggleSkills}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4 H15 L19 8 V20 H5 Z M9 12 H15 M9 16 H13" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"></path></svg></span><span style="flex: 1 1 auto">Use a skill</span><span aria-hidden="true" class="muted">›</span></button>
+<sc-if value="{{skillsOpen}}" hint-placeholder-val="{{false}}">
+<div style="margin: 0 0 4px 52px; border-left: 1px solid #EAE7DE; padding-left: 6px"><sc-for list="{{skillPick}}" as="sk" hint-placeholder-count="4"><button class="mi" type="button" onClick="{{sk.pick}}" style="min-height: 34px; font-size: 13.5px">{{sk.name}}</button></sc-for></div>
+</sc-if>
+<button class="mi" type="button" onClick="{{createSkill}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5 V19 M5 12 H19" stroke="#3D3C38" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span style="display: flex; flex-direction: column"><span>Create a skill</span><span class="muted" style="font-size: 12px">Teach Revlane your way of working</span></span></button>
+<div style="height: 1px; background: #F1EFE8; margin: 4px 8px"></div>
+<button class="mi" type="button" onClick="{{startRoutine}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#3D3C38" stroke-width="1.6" fill="none"></circle><path d="M12 7.5 V12 L15 14" stroke="#3D3C38" stroke-width="1.6" fill="none" stroke-linecap="round"></path></svg></span><span style="display: flex; flex-direction: column"><span>Create a routine</span><span class="muted" style="font-size: 12px">Run a question or agent on a schedule</span></span></button>
+<button class="mi" type="button" onClick="{{manageRoutines}}"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7 H19 M5 12 H19 M5 17 H13" stroke="#3D3C38" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span>Manage routines</span></button>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px">
+<sc-for list="{{quick}}" as="q" hint-placeholder-count="6"><button class="chip" type="button" onClick="{{q.go}}">{{q.label}}</button></sc-for>
+</div>
+</sc-if>
+</div>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isPage}}" hint-placeholder-val="{{false}}">
+<div style="flex: 1 1 auto; padding: 12px 40px 56px; display: flex; justify-content: center">
+<div class="rise" style="width: 100%; max-width: 1040px; display: flex; flex-direction: column; gap: 24px">
+
+<sc-if value="{{isAgents}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 22px">
+<div><h1 class="serif" style="margin: 0; font-size: 38px">Agents</h1><p class="muted" style="margin: 6px 0 0; font-size: 15px">Six agents, each guarding one way money slips away.</p></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px">
+<sc-for list="{{agents}}" as="a" hint-placeholder-count="6">
+<button class="card" type="button" onClick="{{a.open}}" style="display: flex; flex-direction: column; gap: 12px; text-align: left; cursor: pointer; font: inherit; color: inherit">
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%"><span style="display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{a.color}}"></span><span class="eyebrow">{{a.family}}</span></span><span class="pill" style="{{a.statusStyle}}">{{a.statusLabel}}</span></div>
+<div class="serif" style="font-size: 22px">{{a.name}}</div>
+<div style="font-size: 14px; line-height: 1.55; color: #3D3C38">{{a.headline}}</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-top: auto; padding-top: 10px; border-top: 1px solid #F1EFE8"><span class="muted" style="font-size: 13px">Found last 7 days</span><span class="serif num" style="font-size: 24px">{{a.amt}}</span></div>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isAgent}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; gap: 8px"><button class="btn" type="button" onClick="{{goAgents}}">← Agents</button><button class="btn" type="button" onClick="{{askAboutAgent}}">Discuss in chat</button></div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: flex-end"><div style="flex: 1 1 480px"><div class="eyebrow">{{cur.family}} agent</div><h1 class="serif" style="margin: 8px 0 0; font-size: 38px">{{cur.name}}</h1><p class="serif" style="margin: 12px 0 0; font-size: 20px; line-height: 1.5; color: #3D3C38">{{cur.headline}}</p></div><div style="text-align: right"><div class="eyebrow">Lost last 7 days</div><div class="serif num" style="font-size: 48px; line-height: 1">{{cur.amt}}</div><div style="margin-top: 8px"><span class="pill" style="{{cur.statusStyle}}">{{cur.statusLabel}}</span></div></div></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px">
+<section class="card" aria-labelledby="diag-h"><h2 id="diag-h" class="serif" style="margin: 0 0 6px; font-size: 21px">Why it happened</h2><sc-for list="{{cur.causes}}" as="c" hint-placeholder-count="3"><div style="padding: 12px 0; border-top: 1px solid #F1EFE8"><div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span>{{c.label}}</span><span class="num" style="font-weight: 500">{{c.pct}}</span></div><div class="track" style="margin-top: 8px"><span style="display: block; height: 6px; border-radius: 999px; background: #D97757; width: {{c.w}}"></span></div></div></sc-for><div class="soft mono" style="font-size: 11.5px; margin-top: 12px; color: #3D3C38">{{cur.tools}}</div></section>
+<section class="card" aria-labelledby="prop-h" style="display: flex; flex-direction: column; gap: 14px"><div class="eyebrow">Proposed fix</div><h2 id="prop-h" class="serif" style="margin: 0; font-size: 20px; line-height: 1.5; font-weight: 400">{{cur.proposal}}</h2><div><sc-for list="{{cur.meta}}" as="mt" hint-placeholder-count="4"><div class="line"><span class="muted">{{mt.k}}</span><span class="num">{{mt.v}}</span></div></sc-for></div>
+<sc-if value="{{cur.isPending}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-wrap: wrap; gap: 8px"><button class="btn btnc" type="button" onClick="{{cur.approve}}">Approve</button><button class="btn" type="button" onClick="{{cur.reject}}">Reject</button></div></sc-if>
+<sc-if value="{{cur.isDone}}" hint-placeholder-val="{{false}}"><div class="soft" style="font-size: 14px; line-height: 1.5">{{cur.doneText}}</div><div><button class="btn" type="button" onClick="{{cur.undo}}">Undo</button></div></sc-if></section>
+</div>
+<section class="card" aria-labelledby="auto-h"><div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; align-items: center"><div style="flex: 1 1 340px"><h2 id="auto-h" class="serif" style="margin: 0; font-size: 21px">How much it can do on its own</h2><p class="muted" style="margin: 4px 0 0; font-size: 13px">Agents earn autonomy: 50+ proposals at 95% approval, then 30 days without incidents.</p></div><div role="group" aria-label="Autonomy level" style="display: flex; gap: 4px; background: #F4F2EC; padding: 4px; border-radius: 12px"><sc-for list="{{levels}}" as="lv" hint-placeholder-count="4"><button class="btn" type="button" style="border-color: transparent; {{lv.style}}" onClick="{{lv.pick}}">{{lv.label}}</button></sc-for></div></div><p style="margin: 12px 0 0; font-size: 14px; color: #3D3C38">{{levelNote}}</p></section>
+</div>
+</sc-if>
+
+<sc-if value="{{isWorkflows}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-end"><div><h1 class="serif" style="margin: 0; font-size: 38px">Workflows</h1><p class="muted" style="margin: 6px 0 0; font-size: 15px">Event-driven workflows and scheduled routines, in one place. Build new ones from chat.</p></div><button class="btn btnp" type="button" onClick="{{buildInChat}}">Build in chat</button></div>
+<section class="card" style="padding: 6px 22px"><div class="eyebrow" style="padding: 16px 0 4px">Triggered by events</div><sc-for list="{{workflows}}" as="w" hint-placeholder-count="3"><div class="line" style="align-items: center; padding: 14px 0"><span style="display: flex; flex-direction: column; gap: 3px; flex: 1 1 auto"><span style="font-weight: 500">{{w.name}}</span><span class="muted" style="font-size: 13px">{{w.sub}}</span></span><span class="pill" style="{{w.style}}">{{w.status}}</span></div></sc-for></section>
+<section class="card" style="padding: 6px 22px"><div class="eyebrow" style="padding: 16px 0 4px">On a schedule (routines)</div><sc-for list="{{routines}}" as="rt" hint-placeholder-count="4"><div class="line" style="align-items: center; padding: 14px 0"><span style="display: flex; flex-direction: column; gap: 3px; flex: 1 1 auto"><span style="font-weight: 500">{{rt.name}}</span><span class="muted" style="font-size: 13px">{{rt.when}}</span></span><span class="pill" style="{{rt.style}}">{{rt.status}}</span><button class="btn" type="button" onClick="{{rt.toggle}}">{{rt.toggleLabel}}</button></div></sc-for></section>
+</div>
+</sc-if>
+
+<sc-if value="{{isApprovals}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 18px; max-width: 900px">
+<div><h1 class="serif" style="margin: 0; font-size: 38px">{{approvalsTitle}}</h1><p class="muted" style="margin: 6px 0 0; font-size: 15px">Nothing that touches money or customers runs without you, until you give an agent more autonomy.</p></div>
+<sc-for list="{{pendingList}}" as="p" hint-placeholder-count="4"><div class="card" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><div style="flex: 1 1 360px"><div style="display: flex; gap: 10px; align-items: baseline"><span class="serif" style="font-size: 19px">{{p.name}}</span><span class="muted num" style="font-size: 13px">{{p.amt}} at stake</span></div><div style="font-size: 14px; margin-top: 4px; line-height: 1.55; color: #3D3C38">{{p.proposal}}</div></div><div style="display: flex; gap: 8px"><button class="btn" type="button" onClick="{{p.reject}}">Reject</button><button class="btn btnc" type="button" onClick="{{p.approve}}">Approve</button></div></div></sc-for>
+<sc-if value="{{hasDone}}" hint-placeholder-val="{{false}}"><div><div class="eyebrow">Decided</div><sc-for list="{{doneList}}" as="d" hint-placeholder-count="2"><div class="line"><span>{{d.name}}</span><span class="pill" style="{{d.statusStyle}}">{{d.statusLabel}}</span></div></sc-for></div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{isConnections}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 22px">
+<div><h1 class="serif" style="margin: 0; font-size: 38px">Connections</h1><p class="muted" style="margin: 6px 0 0; font-size: 15px">Revlane reads with your credentials and acts only through your own accounts. It never holds your money.</p></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px"><sc-for list="{{connections}}" as="c" hint-placeholder-count="10"><div class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="display: flex; align-items: center; gap: 10px"><span class="serif" style="width: 32px; height: 32px; border-radius: 9px; background: #F4F2EC; display: flex; align-items: center; justify-content: center; font-size: 16px">{{c.initial}}</span><span style="font-weight: 500">{{c.name}}</span></span><span class="pill" style="{{c.style}}">{{c.status}}</span></div><div class="eyebrow" style="font-size: 11px">{{c.kind}}</div><div class="muted" style="font-size: 13px; line-height: 1.5">{{c.detail}}</div></div></sc-for></div>
+<section class="card" aria-labelledby="mcp-h"><h2 id="mcp-h" class="serif" style="margin: 0; font-size: 21px">Bring any system</h2><p class="muted" style="margin: 4px 0 14px; font-size: 14px">Connect your own MCP server or API. You decide which tools agents may use.</p><div style="display: flex; flex-wrap: wrap; gap: 8px"><label for="mcpurl" style="position: absolute; left: -9999px">MCP server URL</label><input id="mcpurl" class="fld mono" style="flex: 1 1 320px; font-size: 13px" value="{{mcpUrl}}" onChange="{{onMcpUrl}}"><button class="btn btnp" type="button" onClick="{{addMcp}}">Connect</button></div>
+<sc-if value="{{customAdded}}" hint-placeholder-val="{{false}}"><div style="margin-top: 16px"><div style="font-weight: 500">acme-inventory · 4 tools found</div><sc-for list="{{mcpTools}}" as="tl" hint-placeholder-count="4"><div class="line"><span class="mono" style="font-size: 13px">{{tl.name}}</span><span class="pill" style="{{tl.style}}">{{tl.perm}}</span></div></sc-for></div></sc-if></section>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-if>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      view: 'chat', agent: 'failure', editKey: '', agentSimulated: false,
+      pinned: true, hover: false,
+      status: { failure: 'pending', routing: 'pending', recon: 'pending', fees: 'pending', chargeback: 'approved', subs: 'approved' },
+      autonomy: { failure: 1, routing: 0, recon: 1, fees: 1, chargeback: 1, subs: 2 },
+      messages: [], draft: '', thinking: false, thinkingText: '',
+      plusOpen: false, skillsOpen: false, attach: [], notifOpen: false, unread: true,
+      routineSaved: false, skillSaved: false, paused: {}, ran: {},
+      wfSimulated: false, wfPublished: false, wfDrafted: false,
+      mcpUrl: 'https://mcp.acme-travel.internal/inventory', customAdded: false
+    };
+  }
+  componentWillUnmount() { if (this.timer) clearTimeout(this.timer); }
+  data() {
+    return [
+      { key: 'failure', name: 'Failed-payment recovery', short: 'Failures', leak: 'Failed payments', family: 'Recover', lost: 9.4, color: '#C4643F',
+        headline: 'UPI payments from HDFC Bank customers on Razorpay timed out on Tuesday, 2–4 pm. Success fell 9.1 points.',
+        causes: [['UPI · HDFC Bank · Razorpay · bank timeout', 71], ['Card · ICICI · PayU · 3D Secure failed', 18], ['Other banks and methods', 11]],
+        proposal: 'Send 600 shoppers who are likely to come back a link with another UPI app or a no-cost EMI, holding 106 back as a control group.',
+        meta: [['Targets', '600 shoppers'], ['Control group', '106 (15%)'], ['Expected recovery', '₹2.1L–₹3.9L'], ['Channel', 'WhatsApp, then SMS']],
+        tools: 'query_attempts → baseline_anomaly → root_cause_split → rupee_impact → recoverability_score',
+        done: 'Approved. 600 links are queued on WhatsApp through each shopper\'s original gateway; results against control in 48 hours.',
+        settings: [['Trigger when success drops by', '1.5 points'], ['High-value threshold', '₹25,000'], ['Fallback methods', 'Other UPI app, no-cost EMI'], ['Quiet hours', '10 pm – 8 am']] },
+      { key: 'routing', name: 'Routing advisor', short: 'Routing', leak: 'Weaker gateway for some banks', family: 'Recover', lost: 3.5, color: '#E39572',
+        headline: 'ICICI credit cards succeed 6.2 points more often on PayU than on Razorpay this week.',
+        causes: [['ICICI credit cards sent to Razorpay', 58], ['Axis debit cards sent to Cashfree', 27], ['SBI UPI collect requests', 15]],
+        proposal: 'Move ICICI credit-card traffic from Razorpay to PayU, for an estimated 1.8-point lift in card success. Your payments team applies it.',
+        meta: [['Scope', '~4,100 attempts / week'], ['Evidence', '28 days, 95% conf.'], ['Expected gain', '₹1.9L a week'], ['Applied by', 'Payments team']],
+        tools: 'success_matrix → baseline_anomaly → rupee_impact',
+        done: 'Approved. Revlane will compare success before and after the change for 14 days.',
+        settings: [['Minimum attempts', '200'], ['Confidence required', '95%'], ['Review cadence', 'Weekly, Monday 9 am'], ['Notify', '#payments on Slack']] },
+      { key: 'recon', name: 'Reconciliation', short: 'Reconciliation', leak: 'Paid, never received', family: 'Money', lost: 3.1, color: '#8C3A1C',
+        headline: '40 paid bookings were auto-refunded, and 3 marketplace settlements arrived short.',
+        causes: [['Paid bookings auto-refunded', 42], ['Marketplace settlements short-paid', 39], ['Captured, not settled after 3 days', 19]],
+        proposal: 'Offer the 40 auto-refunded bookings back to their customers, and raise 3 settlement queries with the marketplace, evidence attached.',
+        meta: [['Re-offer', '40 bookings · ₹1.3L'], ['Queries', '3 · ₹1.2L'], ['In transit', '₹0.6L'], ['Matched today', '98.7% of ₹4.2 Cr']],
+        tools: 'three_way_match → settlement_lines → bank_credits → rupee_impact',
+        done: 'Approved. Re-booking offers sent to 40 customers and 3 queries filed; Revlane will check the next payouts.',
+        settings: [['Match tolerance', '₹1 per line'], ['Flag unsettled after', '3 days'], ['Post entries to', 'Zoho Books'], ['Daily summary to', '#finance']] },
+      { key: 'fees', name: 'Fee audit', short: 'Fees', leak: 'Fee overcharges', family: 'Money', lost: 2.6, color: '#BC8B66',
+        headline: 'Cashfree charged 2.15% on Amex cards against a 2.00% contract, and PayU charged GST on refunded fees.',
+        causes: [['Amex rate above contract · Cashfree', 61], ['GST on refunded fees · PayU', 24], ['Instant-payout fee · Razorpay', 15]],
+        proposal: 'Send overcharge claims to Cashfree, PayU and Razorpay with transaction-level evidence, and track the credits on future settlements.',
+        meta: [['Claims', '3 providers'], ['Amount', '₹2.6L · October'], ['Evidence', '1,912 lines'], ['Follow-up', 'Next 2 settlements']],
+        tools: 'fee_check → settlement_lines → contract_rates',
+        done: 'Approved. Claims sent to 3 providers; Revlane will confirm the credits on the next settlements.',
+        settings: [['Overcharge threshold', '₹1 or 0.05% per line'], ['Contract file', 'Fee contracts 2026.pdf'], ['Claim contact', 'finance@acme-travel.example'], ['Run on', '1st of month']] },
+      { key: 'subs', name: 'Subscription recovery', short: 'Subscriptions', leak: 'Failed auto-debits', family: 'Recover', lost: 2.2, color: '#7A6A5C',
+        headline: '212 Acme Plus auto-debits failed this month, 61% for insufficient funds in the first 3 days.',
+        causes: [['Insufficient funds at month start', 61], ['Expired or replaced card', 23], ['Mandate revoked or paused', 16]],
+        proposal: 'Retry 129 debits after the 5th with pre-debit notice, and send card-update links to 48 members and re-register links to 35.',
+        meta: [['Retries', '129 after the 5th'], ['Update links', '48'], ['Re-register', '35'], ['At risk', '₹2.2L a month']],
+        tools: 'mandate_failures → retry_timing → recoverability_score',
+        done: 'Running. Retries scheduled for the 6th with pre-debit notices; 83 update and re-register links sent.',
+        settings: [['Max retries', '2 per cycle'], ['Retry window', '6th–8th, 9 am – 12 pm'], ['Pre-debit notice', '24 hours'], ['Stop after', '30 days']] },
+      { key: 'chargeback', name: 'Chargeback', short: 'Disputes', leak: 'Disputes at risk', family: 'Recover', lost: 1.8, color: '#D9B8A3',
+        headline: '5 disputes are due within 48 hours; 3 look winnable because payments passed 3D Secure and customers travelled.',
+        causes: [['Winnable: verified and travelled', 64], ['Low odds: no proof of travel', 24], ['Repeat disputer', 12]],
+        proposal: 'Submit evidence-backed responses for the 3 winnable disputes, and accept the 2 with low odds to save handling cost.',
+        meta: [['Due', 'Within 48 hours'], ['Win odds', '78%, 74%, 69%'], ['At stake', '₹1.8L'], ['Evidence', 'Booking, 3DS, boarding']],
+        tools: 'get_disputes → win_odds → evidence_pack',
+        done: 'Running. 3 responses submitted with evidence; 2 accepted. Bank decisions in 30–45 days.',
+        settings: [['Contest above win odds', '60%'], ['Evidence sources', 'Bookings, check-in, tickets'], ['Escalate above', '₹50,000'], ['Approver', 'Arjun (Payments)']] }
+    ];
+  }
+  lakh(n) { return '₹' + n.toFixed(1) + 'L'; }
+  setStatus(key, st) { this.setState((p) => ({ status: Object.assign({}, p.status, { [key]: st }) })); }
+  setAuto(key, lvl) { this.setState((p) => ({ autonomy: Object.assign({}, p.autonomy, { [key]: lvl }) })); }
+  post(msg) { this.setState((p) => ({ messages: p.messages.concat([msg]), view: 'chat' })); }
+  answerFor(text, attach) {
+    const t = text.toLowerCase();
+    const has = (w) => t.indexOf(w) > -1;
+    if (has('my routines') || has('manage routines')) return 'routines';
+    if (has('every ') || has('schedule') || has('remind')) return 'routine';
+    if (has('skill')) return 'skill';
+    if (attach.some((a) => a.kind === 'CSV')) return 'file';
+    if (has('workflow') || has('automate') || has('booking')) return 'wf';
+    if (has('fee') || has('cheap') || has('charge') || has('mdr')) return 'fee';
+    if (has('reconcil') || has('settle') || has('statement')) return 'file';
+    if (has('dispute') || has('chargeback')) return 'cb';
+    if (has('subscription') || has('debit') || has('mandate')) return 'subs';
+    if (has('lost') || has('lose') || has('leak') || has('most') || has('summary')) return 'lost';
+    if (has('routing') || has('gateway for')) return 'routing';
+    if (has('drop') || has('why') || has('success') || has('fail')) return 'drop';
+    return 'none';
+  }
+  reply(kind, skill) {
+    const sk = skill ? ['skill: ' + skill] : [];
+    const R = (o) => Object.assign({ role: 'bot' }, o, { steps: sk.concat(o.steps || []) });
+    if (kind === 'drop') return R({ steps: ['query_attempts', 'baseline_anomaly', 'root_cause_split', 'rupee_impact'], cols: true,
+      text: 'Success fell from 87.6% to 82.9% between 2 and 4 pm on Tuesday. 71% of the drop came from UPI payments by HDFC Bank customers on Razorpay, which timed out at the bank; most of the rest was ICICI credit cards failing 3D Secure on PayU. About ₹9.4L slipped away, and 706 shoppers look recoverable.',
+      rows: [['Segment', 'Change', 'Share of drop'], ['UPI · HDFC Bank · Razorpay', '−9.1 pts', '71%'], ['Card · ICICI · PayU', '−4.0 pts', '18%'], ['Other', '—', '11%']],
+      source: 'q_204, q_205 · 41,280 attempts · Razorpay, PayU, Cashfree · baseline: same hours, last 4 weeks',
+      actionLabel: 'Show me the recovery plan', action: 'card:failure' });
+    if (kind === 'lost') return R({ steps: ['query_attempts', 'three_way_match', 'fee_check', 'rupee_impact'], chart: true,
+      text: '₹22.6L slipped away last week across your three gateways, and ₹6.8L has already been recovered this month. Failed payments were the biggest leak, then sales lost on the weaker gateway for some banks, then paid bookings that never reached you. Four fixes are waiting for you.',
+      source: 'q_210 – q_215 · 3 gateways · HDFC statements · bookings',
+      actionLabel: 'Review the 4 fixes', action: 'fixes' });
+    if (kind === 'fee') return R({ steps: ['settlement_lines', 'contract_rates', 'fee_check'],
+      text: 'On UPI, none of your providers charges you under your contracts. On domestic cards last month, PayU was cheapest at 1.86%, then Razorpay at 1.92% and Cashfree at 1.97%. Cashfree also charged 2.15% on Amex against a 2.00% contract: ₹2.6L in overcharges is ready to claim.',
+      rows: [['Provider', 'Cards, effective', 'Overcharged'], ['PayU', '1.86%', '₹0.6L'], ['Razorpay', '1.92%', '₹0.4L'], ['Cashfree', '1.97%', '₹1.6L']],
+      source: 'q_220, q_221 · 1,912 settlement lines · Fee contracts 2026.pdf',
+      actionLabel: 'Show me the claims', action: 'card:fees' });
+    if (kind === 'file') return R({ steps: ['read_file(HDFC_statement_Oct.csv)', 'three_way_match', 'settlement_lines'],
+      text: 'I matched the 1,204 credits in your HDFC statement against settlements from all three gateways. 98.7% match to the rupee. Three marketplace payouts arrived ₹1.2L short, and 40 paid bookings were auto-refunded because the order never confirmed — another ₹1.3L.',
+      rows: [['Finding', 'Items', 'Amount'], ['Marketplace payouts short', '3', '₹1.2L'], ['Paid, auto-refunded', '40', '₹1.3L'], ['Captured, not yet settled', '22', '₹0.6L']],
+      source: 'HDFC_statement_Oct.csv · 1,204 rows · matched by UTR',
+      actionLabel: 'Show me the fix', action: 'card:recon' });
+    if (kind === 'cb') return R({ steps: ['get_disputes', 'win_odds', 'evidence_pack'],
+      text: 'Five disputes are due within 48 hours. Three are worth contesting: the payments passed 3D Secure and the customers travelled. The other two have no proof of travel, so accepting them saves handling cost.',
+      rows: [['Dispute', 'Win odds', 'Amount'], ['DP-2291', '78%', '₹46,200'], ['DP-2296', '74%', '₹38,900'], ['DP-2301', '69%', '₹41,500']],
+      source: 'Disputes from PayU and Razorpay · bookings · check-in records', actionLabel: 'Show me the responses', action: 'card:chargeback' });
+    if (kind === 'subs') return R({ steps: ['mandate_failures', 'retry_timing'],
+      text: '212 membership auto-debits failed this month. 61% were insufficient funds in the first three days, so retrying after the 5th should recover most of them. The rest need a card update or a new mandate.',
+      rows: [['Reason', 'Count', 'Plan'], ['Insufficient funds', '129', 'Retry after 5th'], ['Expired card', '48', 'Update link'], ['Mandate revoked', '35', 'Re-register']],
+      source: 'Mandates on Razorpay and Cashfree · Acme Plus members', actionLabel: 'Show me the plan', action: 'card:subs' });
+    if (kind === 'routing') return R({ steps: ['success_matrix', 'rupee_impact'],
+      text: 'ICICI credit cards succeed 6.2 points more often on PayU than on Razorpay this week. Moving that traffic would lift overall card success by about 1.8 points, worth roughly ₹1.9L a week.', agentKey: 'routing' });
+    if (kind === 'wf') return R({ steps: ['draft_workflow', 'list_tools(acme-inventory)', 'simulate(90d)'], wf: true,
+      text: 'Here is a draft. When a booking payment of ₹40,000 or more fails, it checks the seat in your inventory system and holds it for 30 minutes, then sends a UPI or EMI link once you approve. Paid: it confirms the booking and posts to your ledger. Not paid: it releases the seat and alerts sales on Slack.' });
+    if (kind === 'routine') return R({ steps: ['create_routine'], routine: true,
+      text: 'Set up as a routine: every Monday at 9:00 I will compile last week\'s leakage by gateway and by cause and post it to #finance on Slack, with links to any fixes waiting for approval.' });
+    if (kind === 'routines') return R({ steps: ['list_routines'], routines: true, text: 'Here are your routines. You can run any of them now or pause them, right here.' });
+    if (kind === 'skill') return R({ steps: ['draft_skill'], skill: true,
+      text: 'Here is a draft skill from what you described. Skills are written instructions that chat and your agents follow every time. Edit it, then save.' });
+    return R({ text: 'This prototype answers a few sample questions. Try a suggestion, attach a file with +, or ask about failures, fees, settlements, disputes, subscriptions or a workflow.' });
+  }
+  send(text) {
+    const q = (text || '').trim();
+    if (!q || this.state.thinking) return;
+    const attach = this.state.attach;
+    const files = attach.filter((a) => a.kind !== 'SKILL');
+    const skillA = attach.find((a) => a.kind === 'SKILL');
+    const kind = this.answerFor(q, attach);
+    const thinkingText = kind === 'file' ? 'Reading HDFC_statement_Oct.csv and matching it against 3 gateways…' : kind === 'routine' || kind === 'routines' ? 'Checking your routines…' : kind === 'skill' ? 'Drafting the skill…' : 'Reading 41,280 attempts across 3 gateways…';
+    this.setState((p) => ({ messages: p.messages.concat([{ role: 'user', text: q, files: files }]), draft: '', attach: [], plusOpen: false, skillsOpen: false, thinking: true, thinkingText, view: 'chat', notifOpen: false, pinned: p.messages.length === 0 ? false : p.pinned }));
+    this.timer = setTimeout(() => { this.setState((p) => ({ messages: p.messages.concat([this.reply(kind, skillA ? skillA.name : '')]), thinking: false })); }, 1200);
+  }
+  runAction(a) {
+    if (a === 'fixes') {
+      const keys = this.data().filter((x) => this.state.status[x.key] === 'pending').map((x) => x.key);
+      this.post({ role: 'bot', steps: ['list_proposals'], fixes: keys, text: keys.length ? 'Here are the fixes waiting for you. Approve them right here; anything you approve starts running straight away.' : 'Nothing is waiting. Every fix has been decided.' });
+    } else if (a.indexOf('card:') === 0) {
+      const key = a.slice(5);
+      this.post({ role: 'bot', steps: ['get_proposal(' + key + ')'], agentKey: key, text: 'Here is the plan. You can approve it, change its rules first, or reject it.' });
+    }
+  }
+  addAttach(item) { this.setState((p) => ({ attach: p.attach.filter((a) => a.name !== item.name).concat([item]), plusOpen: false, skillsOpen: false })); }
+  renderVals() {
+    const s = this.state;
+    const all = this.data();
+    const byKey = {}; all.forEach((a) => { byKey[a.key] = a; });
+    const total = all.reduce((x, a) => x + a.lost, 0);
+    const maxLost = Math.max.apply(null, all.map((a) => a.lost));
+    const statusInfo = (st) => st === 'approved' ? { label: 'Running', style: 'background: #E3EDE5; color: #23513A' }
+      : st === 'rejected' ? { label: 'Rejected', style: 'background: #EFECE4; color: #3D3C38' }
+      : { label: 'Needs you', style: 'background: #F5E2D7; color: #7A3319' };
+    const pendingCount = all.filter((a) => s.status[a.key] === 'pending').length;
+    const open = (key) => () => this.setState({ view: 'agent', agent: key, notifOpen: false });
+    const agentView = (a) => {
+      const si = statusInfo(s.status[a.key]);
+      return { key: a.key, name: a.name, family: a.family, headline: a.headline, proposal: a.proposal, tools: a.tools, color: a.color,
+        amt: this.lakh(a.lost), statusLabel: si.label, statusStyle: si.style,
+        causes: a.causes.map((c) => ({ label: c[0], pct: c[1] + '%', w: c[1] + '%' })),
+        meta: a.meta.map((m) => ({ k: m[0], v: m[1] })),
+        settings: a.settings.map((m, i) => ({ k: m[0], v: m[1], id: 'set-' + a.key + '-' + i })),
+        isPending: s.status[a.key] === 'pending', isDone: s.status[a.key] !== 'pending',
+        doneText: s.status[a.key] === 'approved' ? a.done : 'Rejected. Revlane will learn from this and won\'t propose the same fix this week.',
+        editing: s.editKey === a.key,
+        approve: () => this.setStatus(a.key, 'approved'), reject: () => this.setStatus(a.key, 'rejected'), undo: () => this.setStatus(a.key, 'pending'),
+        edit: () => this.setState((p) => ({ editKey: p.editKey === a.key ? '' : a.key, agentSimulated: false })),
+        details: () => this.runAction('card:' + a.key), openPage: open(a.key), open: open(a.key) };
+    };
+    const agents = all.map(agentView);
+    const cur = agentView(byKey[s.agent] || all[0]);
+    const icons = { agents: 'M12 3 L14 9 L20 9.5 L15.5 13.5 L17 20 L12 16.5 L7 20 L8.5 13.5 L4 9.5 L10 9 Z', workflows: 'M4 5 H10 V10 H4 Z M14 14 H20 V19 H14 Z M7 10 V16.5 H14', connections: 'M9 7 H7 A5 5 0 0 0 7 17 H9 M15 7 H17 A5 5 0 0 1 17 17 H15 M8 12 H16', approvals: 'M4.5 12.5 L9.5 17.5 L19.5 6.5', chat: 'M4 5 H20 V16 H10 L6 20 V16 H4 Z' };
+    const views = [['chat', 'Chat'], ['agents', 'Agents'], ['workflows', 'Workflows'], ['approvals', 'Approvals'], ['connections', 'Connections']];
+    const activeView = s.view === 'agent' ? 'agents' : s.view;
+    const nav = views.map((v) => ({ label: v[1], icon: icons[v[0]], style: v[0] === activeView ? 'background: #E9E5DB; color: #1F1E1D; font-weight: 500' : '',
+      go: () => this.setState({ view: v[0], notifOpen: false }), hasBadge: v[0] === 'approvals' && pendingCount > 0, badge: String(pendingCount) }));
+    const expanded = s.pinned || s.hover;
+    const recentQs = [['Tuesday\'s success-rate drop', 'Why did success drop on Tuesday?'], ['Card fees by gateway', 'Which gateway is cheapest for cards?'], ['Disputes due this week', 'Which disputes should we contest?'], ['Membership auto-debits', 'Why are subscription debits failing?'], ['Booking rescue workflow', 'Build a workflow for failed bookings over ₹40K']];
+    const recents = recentQs.map((r) => ({ label: r[0], go: () => this.setState({ messages: [], view: 'chat' }, () => this.send(r[1])) }));
+    const levelNames = ['Observe', 'Suggest', 'Batch', 'Auto'];
+    const levelNotes = ['Observe: it diagnoses and reports, and proposes nothing.', 'Suggest: every proposal waits for your approval.', 'Batch: you approve a type of action for a whole run or day.', 'Auto: it acts inside the limits you set and reports in a daily digest.'];
+    const curLevel = s.autonomy[cur.key];
+    const levels = levelNames.map((n, i) => ({ label: n, style: i === curLevel ? 'background: #FFFFFF; box-shadow: 0 1px 2px rgba(31,30,29,.12)' : 'background: transparent', pick: () => this.setAuto(cur.key, i) }));
+    const fileStyle = { CSV: ['#E3EDE5', '#23513A'], LINK: ['#E7E9F2', '#2E3A6B'], SKILL: ['#1F1E1D', '#FAF9F5'] };
+    const decorate = (a) => Object.assign({}, a, { bg: fileStyle[a.kind][0], fg: fileStyle[a.kind][1] });
+    const attach = s.attach.map((a) => Object.assign(decorate(a), { remove: () => this.setState((p) => ({ attach: p.attach.filter((x) => x.name !== a.name) })) }));
+    const chartBars = all.map((a) => ({ label: a.leak, amt: this.lakh(a.lost), color: a.color, w: Math.round(a.lost / maxLost * 100) + '%', share: (a.lost / total * 100).toFixed(1) + '%' }));
+    const split = [['Razorpay', 11.8], ['PayU', 7.4], ['Cashfree', 3.4]].map((g) => ({ name: g[0], amt: this.lakh(g[1]) }));
+    const hours = [['10', 88.1], ['11', 87.9], ['12', 88.4], ['13', 87.7], ['14', 82.9], ['15', 81.6], ['16', 86.8], ['17', 87.5], ['18', 88.0], ['19', 87.8], ['20', 88.2]];
+    const cols = hours.map((h) => { const dip = h[1] < 85; return { label: h[0], val: h[1].toFixed(1), h: Math.round((h[1] - 78) / 12 * 120) + 'px', color: dip ? '#D97757' : '#DDD8CB', labelColor: dip ? '#7A3319' : '#6B6A63' }; });
+    const tones = { tool: ['#E7E9F2', '#2E3A6B'], agent: ['#F5E2D7', '#7A3319'], approval: ['#1F1E1D', '#FAF9F5'], base: ['#EFECE4', '#3D3C38'] };
+    const wfSteps = [
+      ['When a booking payment of ₹40,000+ fails', 'trigger: payment_attempt.failed · any gateway', 'Trigger', 'base'],
+      ['Check the seat', 'acme-inventory.check_seat', 'Your tool', 'tool'],
+      ['Hold it 30 minutes, or alert sales if none', 'acme-inventory.hold_seat', 'Your tool', 'tool'],
+      ['Send a UPI or EMI link', 'agent: failed_payment_recovery · WhatsApp', 'Needs approval', 'approval'],
+      ['Wait up to 30 minutes for payment', 'wait_for: payment_attempt.succeeded', 'Revlane', 'agent'],
+      ['Paid: confirm and post. Not paid: release and alert #bookings', 'revlane.post_ledger · slack.post', 'Revlane + Slack', 'agent']
+    ].map((w, i) => ({ n: String(i + 1), title: w[0], sub: w[1], tag: w[2], bg: tones[w[3]][0], fg: tones[w[3]][1] }));
+    const live = 'background: #E3EDE5; color: #23513A';
+    const idle = 'background: #EFECE4; color: #3D3C38';
+    const routineDefs = [['weekly', 'Weekly leakage report', 'Mondays 9:00 · posts to #finance on Slack', s.routineSaved], ['close', 'Daily close', 'Every day 7:00 · reconcile and post to Zoho Books', true], ['fees', 'Fee claims', '1st of every month · Fee audit agent', true], ['dl', 'Dispute deadline check', 'Every day 10:00 · WhatsApp to Arjun', true]];
+    const routines = routineDefs.filter((r) => r[3]).map((r, i) => { const paused = !!s.paused[r[0]]; const ran = !!s.ran[r[0]];
+      return { name: r[1], when: r[2], first: i === 0 ? 'border-top: 0' : '', status: ran ? 'Ran just now' : paused ? 'Paused' : 'Active', style: paused ? idle : live,
+        toggleLabel: paused ? 'Resume' : 'Pause', toggle: () => this.setState((p) => ({ paused: Object.assign({}, p.paused, { [r[0]]: !paused }) })),
+        run: () => this.setState((p) => ({ ran: Object.assign({}, p.ran, { [r[0]]: true }) })) }; });
+    const messages = s.messages.map((m) => {
+      const rows = (m.rows || []).map((r, i) => ({ a: r[0], b: r[1], c: r[2], style: i === 0 ? 'font-size: 12px; color: #6B6A63; border-top: 0' : '' }));
+      const steps = m.steps || [];
+      const fixes = (m.fixes || []).map((k) => agentView(byKey[k]));
+      const decided = fixes.filter((f) => !f.isPending).length;
+      return { isUser: m.role === 'user', isBot: m.role === 'bot', text: m.text, files: (m.files || []).map(decorate), hasFiles: !!(m.files && m.files.length),
+        steps, hasSteps: steps.length > 0, stepsLabel: 'Used ' + steps.length + (steps.length === 1 ? ' tool' : ' tools'),
+        rows, hasRows: rows.length > 0, hasChart: !!m.chart, chart: chartBars, split, chartTitle: 'Where it slipped away · last 7 days', chartTotal: this.lakh(total) + ' total',
+        hasCols: !!m.cols, cols, hasFixes: fixes.length > 0, fixes, fixFooter: decided + ' of ' + fixes.length + ' decided · also in Approvals',
+        hasAgent: !!m.agentKey, ag: m.agentKey ? agentView(byKey[m.agentKey]) : cur,
+        hasWf: !!m.wf, hasRoutine: !!m.routine, hasRoutines: !!m.routines, hasSkill: !!m.skill,
+        source: m.source || '', hasSource: !!m.source, hasAction: !!m.action, actionLabel: m.actionLabel || '', act: () => this.runAction(m.action) };
+    });
+    const isEmpty = s.messages.length === 0 && !s.thinking;
+    const quickList = [['Where did we lose the most?', 'Where did we lose the most last week?'], ['Why did success drop?', 'Why did success drop on Tuesday?'], ['Audit our fees', 'Which gateway is cheapest for cards?'], ['Disputes due', 'Which disputes should we contest?'], ['Failed auto-debits', 'Why are subscription debits failing?'], ['Build a workflow', 'Build a workflow for failed bookings over ₹40K']];
+    const quick = quickList.map((q) => ({ label: q[0], go: () => this.send(q[1]) }));
+    const skillNames = ['Refund policy v3', 'Tone of voice', 'EMI rules', 'Dispute evidence checklist'].concat(s.skillSaved ? ['Month-end close'] : []);
+    const skillPick = skillNames.map((n) => ({ name: n, pick: () => this.addAttach({ name: n, kind: 'SKILL' }) }));
+    const notifs = [
+      { title: 'Weekly summary', body: '₹22.6L slipped away last week · ₹6.8L recovered · 4 fixes waiting', time: 'Today, 8:00', dot: '#D97757', go: () => this.setState({ notifOpen: false, unread: false, messages: [] }, () => this.send('Where did we lose the most last week?')) },
+      { title: 'HDFC Bank UPI degraded on Razorpay', body: 'Success fell 9.1 points, Tue 2–4 pm. ₹9.4L lost.', time: 'Tuesday, 16:05', dot: '#D97757', go: () => this.setState({ notifOpen: false, unread: false, messages: [] }, () => this.send('Why did success drop on Tuesday?')) },
+      { title: '5 disputes due in 48 hours', body: '3 look winnable. Responses are drafted.', time: 'Yesterday', dot: '#C9C5B7', go: () => this.setState({ notifOpen: false, unread: false, messages: [] }, () => this.send('Which disputes should we contest?')) }
+    ];
+    const wfStatus = s.wfPublished ? 'Waiting for 2 approvers' : 'Draft';
+    const workflows = [
+      { name: 'High-value booking rescue', sub: 'Built in chat · uses your inventory tool', status: s.wfPublished ? 'Waiting for 2 approvers' : 'Draft', style: 'background: #F5E2D7; color: #7A3319' },
+      { name: 'Failed-payment rescue', sub: 'Template · payments over ₹10,000', status: 'Live', style: live },
+      { name: 'Dispute desk', sub: 'Template · evidence from bookings and tickets', status: 'Live', style: live }];
+    const pendingList = agents.filter((a) => a.isPending);
+    const doneList = agents.filter((a) => !a.isPending);
+    const cs = (k) => k === 'on' ? live : idle;
+    const conns = [['Razorpay', 'Gateway', 'Connected', 'Payments, settlements, payment links · MCP + API', 'on'], ['PayU', 'Gateway', 'Connected', 'Transactions, settlements, chargebacks · MCP + API', 'on'], ['Cashfree', 'Gateway', 'Connected', 'Orders, payments, refunds, settlements · MCP + API', 'on'], ['HDFC Bank', 'Bank', 'Daily', 'Statements matched to settlements by UTR', 'on'], ['Shopify', 'Orders', 'Connected', 'Bookings, cancellations, fulfilment', 'on'], ['Zoho Books', 'Accounting', 'Connected', 'Posts reconciled entries', 'on'], ['Slack', 'Messaging', 'Connected', '#finance, #payments, #bookings', 'on'], ['WhatsApp', 'Messaging', 'Connected', '4 approved templates', 'on'], ['Salesforce', 'CRM', 'Available', 'Customer tier for recovery priority', 'off'], ['BigQuery', 'Warehouse', 'Available', 'Bring your own data; export Revlane data', 'off']];
+    const connections = conns.map((c) => ({ name: c[0], initial: c[0].charAt(0), kind: c[1], status: c[2], detail: c[3], style: cs(c[4]) }));
+    const mcpTools = [['check_seat', 'Read', 'on'], ['hold_seat', 'Needs approval', 'on'], ['release_seat', 'Needs approval', 'on'], ['cancel_booking', 'Blocked', 'off']].map((t) => ({ name: t[0], perm: t[1], style: cs(t[2]) }));
+    const titles = { chat: s.messages.length ? 'Revenue chat' : 'New chat', agents: 'Agents', agent: 'Agents / ' + cur.name, workflows: 'Workflows', approvals: 'Approvals', connections: 'Connections' };
+    return {
+      navW: s.pinned ? '264px' : '68px', panelW: expanded ? '264px' : '68px', showLabels: expanded,
+      panelShadow: (!s.pinned && s.hover) ? 'box-shadow: 8px 0 32px rgba(31,30,29,.10)' : '',
+      pinLabel: s.pinned ? 'Collapse sidebar' : 'Keep sidebar open',
+      togglePin: () => this.setState((p) => ({ pinned: !p.pinned, hover: false })),
+      hoverOn: () => { if (!this.state.pinned) this.setState({ hover: true }); },
+      hoverOff: () => { if (this.state.hover) this.setState({ hover: false }); },
+      nav, recents, agents, cur, levels, levelNote: levelNotes[curLevel], notifs, notifOpen: s.notifOpen, hasUnread: s.unread,
+      title: titles[s.view] || '', messages, thinking: s.thinking, thinkingText: s.thinkingText, draft: s.draft,
+      isEmpty, chatPad: isEmpty ? 'justify-content: center; padding-top: 10vh' : 'padding-top: 20px',
+      composerWrap: isEmpty ? '' : 'position: sticky; bottom: 16px; margin-top: auto; z-index: 4',
+      placeholder: s.attach.some((a) => a.kind === 'CSV') ? 'Ask about this file — e.g. reconcile it against our settlements' : 'How can I help with your revenue today?',
+      quick, attach, hasAttach: attach.length > 0, plusOpen: s.plusOpen, skillsOpen: s.skillsOpen, skillPick,
+      routineSaved: s.routineSaved, routineUnsaved: !s.routineSaved, skillSaved: s.skillSaved, skillUnsaved: !s.skillSaved,
+      routines, wfSteps, wfStatus, wfStatusStyle: 'background: #F5E2D7; color: #7A3319', workflows, agentSimulated: s.agentSimulated,
+      isChat: s.view === 'chat', isPage: s.view !== 'chat',
+      isAgents: s.view === 'agents', isAgent: s.view === 'agent', isWorkflows: s.view === 'workflows', isApprovals: s.view === 'approvals', isConnections: s.view === 'connections',
+      newChat: () => this.setState({ view: 'chat', messages: [], attach: [], plusOpen: false, notifOpen: false }),
+      openSummary: () => this.setState({ unread: false }, () => this.send('Where did we lose the most last week?')),
+      toggleNotif: () => this.setState((p) => ({ notifOpen: !p.notifOpen })),
+      togglePlus: () => this.setState((p) => ({ plusOpen: !p.plusOpen, skillsOpen: false })),
+      toggleSkills: () => this.setState((p) => ({ skillsOpen: !p.skillsOpen })),
+      addFile: () => this.addAttach({ name: 'HDFC_statement_Oct.csv', kind: 'CSV' }),
+      addConnection: () => this.addAttach({ name: 'Shopify · October bookings', kind: 'LINK' }),
+      createSkill: () => this.send('Create a skill for our month-end close'),
+      startRoutine: () => this.setState({ view: 'chat', plusOpen: false, draft: 'Every Monday at 9 am, send last week\'s leakage by gateway to #finance on Slack' }),
+      manageRoutines: () => this.send('Show my routines'),
+      saveRoutine: () => this.setState({ routineSaved: true }),
+      saveSkill: () => this.setState({ skillSaved: true }),
+      simulateAgent: () => this.setState({ agentSimulated: true }),
+      goAgents: () => this.setState({ view: 'agents' }),
+      goWorkflows: () => this.setState({ view: 'workflows' }),
+      buildInChat: () => this.setState({ view: 'chat', messages: [] }, () => this.send('Build a workflow for failed bookings over ₹40K')),
+      askAboutAgent: () => this.setState({ messages: [] }, () => this.runAction('card:' + cur.key)),
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      onKey: (e) => { if (e.key === 'Enter') this.send(this.state.draft); },
+      sendDraft: () => this.send(this.state.draft),
+      wfSimulated: s.wfSimulated, wfPublished: s.wfPublished,
+      simulateWf: () => this.setState({ wfSimulated: true }),
+      publishWf: () => this.setState({ wfPublished: true }),
+      pendingList, doneList, hasDone: doneList.length > 0,
+      approvalsTitle: pendingCount === 0 ? 'You\'re all caught up' : pendingCount + (pendingCount === 1 ? ' fix is waiting for you' : ' fixes are waiting for you'),
+      connections, mcpUrl: s.mcpUrl, customAdded: s.customAdded, mcpTools,
+      onMcpUrl: (e) => this.setState({ mcpUrl: e.target.value }),
+      addMcp: () => this.setState({ customAdded: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

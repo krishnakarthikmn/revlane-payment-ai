@@ -1,0 +1,12 @@
+# Daily summary of lost, recoverable and recovered money, by leak and provider.
+playbook: leakage_audit
+version: 1
+trigger:
+  - schedule: "0 6 * * *"
+read_tools: [three_way_match, rupee_impact, findings_for]
+actions:
+  - type: draft_leakage_report
+    approval: required
+    limits: {max_findings_per_proposal: 50}
+output_schema: FindingAndProposal_v1
+escalate_if: [contract_missing, confidence < 0.8]

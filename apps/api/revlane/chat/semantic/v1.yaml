@@ -1,0 +1,104 @@
+# The semantic layer: every metric Ask Revlane can answer with, and how each
+# may be split. A question that needs anything else is refused.
+#
+# Nothing here is SQL. A source names a read-only view and its columns; a
+# metric is a sum or a ratio over a source with fixed conditions. The compiler
+# turns a query spec into a statement from these names alone.
+version: 1
+
+sources:
+  attempts:
+    view: chat_attempts
+    time: paid_on
+    dimensions:
+      provider: provider
+      method: method
+      instrument_bank: instrument_bank
+      card_network: card_network
+      upi_app: upi_app
+      hour: hour
+      day: day
+      month: month
+  findings:
+    view: chat_findings
+    time: found_on
+    dimensions:
+      provider: provider
+      leak: leak
+      family: family
+      cause: cause
+      state: state
+      month: month
+  settlement_lines:
+    view: chat_settlement_lines
+    time: settled_on
+    dimensions:
+      provider: provider
+      method: method
+      card_network: card_network
+      fee_type: fee_type
+      month: month
+  settlements:
+    view: chat_settlements
+    time: settled_on
+    dimensions:
+      provider: provider
+      month: month
+  refunds:
+    view: chat_refunds
+    time: refunded_on
+    dimensions:
+      provider: provider
+      refund_type: refund_type
+      month: month
+
+metrics:
+  payment_volume_minor:
+    description: Value of payment attempts that succeeded
+    source: attempts
+    sum: amount_minor
+    where: {status: [succeeded]}
+  payment_success_rate:
+    description: Share of payment attempts that succeeded, excluding abandoned attempts
+    source: attempts
+    numerator: {count: true, where: {status: [succeeded]}}
+    denominator: {count: true, where: {status: [succeeded, failed]}}
+  unsettled_minor:
+    description: Value of succeeded payments that are in no settlement yet
+    source: attempts
+    sum: amount_minor
+    where: {status: [succeeded], settled: [false]}
+  lost_minor:
+    description: Everything that leaked, whatever has happened to it since
+    source: findings
+    sum: amount_minor
+    where: {is_leak: [true]}
+  recoverable_minor:
+    description: The part of what leaked that someone can still act on
+    source: findings
+    sum: amount_minor
+    where: {is_leak: [true], state: [recoverable, claimed]}
+  recovered_minor:
+    description: Leaked money that has reached the bank
+    source: findings
+    sum: amount_minor
+    where: {state: [recovered]}
+  fee_overcharge_minor:
+    description: Fees charged outside the contracts
+    source: findings
+    sum: amount_minor
+    where: {is_leak: [true], family: [fee_audit]}
+  fee_effective_rate:
+    description: Fees and tax charged as a share of the payments settled
+    source: settlement_lines
+    numerator: {sum: charged_minor, where: {line_type: [capture]}}
+    denominator: {sum: gross_minor, where: {line_type: [capture]}}
+  match_rate:
+    description: Share of settlements matched to a bank credit
+    source: settlements
+    numerator: {count: true, where: {matched: [true]}}
+    denominator: {count: true}
+  refund_amount_minor:
+    description: Value of refunds
+    source: refunds
+    sum: amount_minor

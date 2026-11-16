@@ -1,0 +1,13 @@
+# Fees charged above contract: proposes a claim to the provider.
+playbook: fee_audit
+version: 1
+trigger:
+  - schedule: "0 6 * * *"
+read_tools: [findings_for, fee_differences, contract_for, settlement_lines, evidence_for]
+actions:
+  - type: draft_fee_claim
+    approval: required
+    applies_to: [fee_above_contract, tax_on_refunded_fee, fee_not_in_contract]
+    limits: {min_claim_minor: 100000, max_claims_per_run: 20}
+output_schema: FindingAndProposal_v1
+escalate_if: [contract_missing, confidence < 0.8]
